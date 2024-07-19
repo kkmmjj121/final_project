@@ -34,8 +34,8 @@ function Lost() {
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
+            setError(null);
 
-            // 단일 ID에 대해 데이터를 요청
             const fetchItem = async (id) => {
                 try {
                     const response = await axios.get(`/lost-items/${id}`, {
@@ -46,18 +46,16 @@ function Lost() {
                     return response.data;
                 } catch (err) {
                     console.log(`Error fetching ID ${id}: ${err.message}`);
-                    return null; // ID가 존재하지 않을 경우 null 반환
+                    return null;
                 }
             };
 
-            // 최대 ID를 결정하고 ID 범위에 대해 요청
-            const maxId = 20; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
-
+            const maxId = 20; // 실제 최대 ID로 교체
             const fetchedItems = [];
             for (let id = 1; id <= maxId; id++) {
                 const item = await fetchItem(id);
                 if (item) {
-                    fetchedItems.push(item); // 유효한 아이템만 추가
+                    fetchedItems.push(item);
                 }
             }
 
@@ -131,11 +129,11 @@ function Lost() {
     const [filteredItems, setFilteredItems] = useState(items);
     const [searchTerm, setSearchTerm] = useState('');
     const handleSearch = () => {
-        let filtered = items;
+        let filtered = [...filteredItems]; // 현재 필터링된 아이템을 복사
 
         // 아이템 이름 필터링
         if (searchTerm.trim() !== '') {
-            filtered = filtered.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            filtered = filtered.filter(item => item.lostName.toLowerCase().includes(searchTerm.toLowerCase()));
         }
 
         // 날짜 필터링
@@ -145,14 +143,12 @@ function Lost() {
                 return itemDate >= startDate && itemDate <= endDate;
             });
         }
-        if (searchTerm.trim() === '' && (!startDate || !endDate)) {
-            filtered = items;
-        }
 
         // 상태 업데이트
         setFilteredItems(filtered);
         setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 설정
     };
+
 
 
     // 현재 페이지에 따라 보여질 아이템을 계산합니다.
@@ -164,6 +160,8 @@ function Lost() {
         setStartDate(null);
         setEndDate(null);
     };
+
+
 
 
     return (
