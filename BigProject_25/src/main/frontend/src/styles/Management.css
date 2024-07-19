@@ -813,8 +813,11 @@
     height: 60px;
     position: relative;
     overflow: hidden;
+
     align-items: center;
+    justify-content: center;
     display: flex;
+
 }
 .ad-main-cate-admin {
     color: #000000;
@@ -1111,15 +1114,14 @@
     position: relative;
     overflow: visible;
 }
-.frame-982,
-.frame-982 * {
-    box-sizing: border-box;
-}
+
 .frame-982 {
     width: 212px;
     height: 60px;
     position: relative;
     overflow: hidden;
+    align-items: center;
+    justify-content: center;
 }
 .frame-983 {
     display: flex;
@@ -1128,8 +1130,9 @@
     align-items: center;
     justify-content: flex-start;
     position: absolute;
-    left: calc(50% - 74px);
-    top: calc(50% - 20px);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 .frame-980 {
     background: #3f51b5;
@@ -1165,6 +1168,7 @@
     position: relative;
     overflow: hidden;
 }
+.session-overlay,
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -1182,8 +1186,11 @@
     background: #fff;
     padding: 20px;
     border-radius: 8px;
-    width: 300px;
+    width: 500px; /* 너비를 500px로 설정 */
+    max-width: 90vw; /* 최대 너비를 뷰포트 너비의 90%로 설정 */
+    max-height: 90vh; /* 최대 높이를 뷰포트 높이의 90%로 설정 */
     position: relative;
+    overflow: auto; /* 내용이 넘칠 경우 스크롤 */
 }
 
 .popup-close {
@@ -1194,4 +1201,34 @@
     border: none;
     font-size: 18px;
     cursor: pointer;
+}
+
+.popup-image {
+    max-width: 100%; /* 팝업 콘텐츠 너비에 맞게 조정 */
+    max-height: 500px; /* 최대 높이를 설정하여 이미지 크기를 제한 */
+    width: auto; /* 너비를 자동으로 설정하여 비율 유지 */
+    height: auto; /* 높이를 자동으로 설정하여 비율 유지 */
+}
+.session-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 1000px;
+    height: 600px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    /* 요소를 정확히 중앙에 배치하기 위한 transform */
+    transform: translate(-50%, -50%);
+}
+.session-close-button {
+    position: absolute;
+    bottom: 20px; /* Adjust as needed */
+    right: 20px;  /* Adjust as needed */
+}
+body.modal-open {
+    overflow: hidden;
 }

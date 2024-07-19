@@ -8,17 +8,60 @@ import axios from 'axios';
 function Management(){
     const [showPopup, setShowPopup] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [popupImageUrl, setPopupImageUrl] = useState(null); // 팝업 이미지 URL 상태 추가
+    const imageUrlRef = useRef(null);
 
-    const handlePopupOpen = (item) => {
+    const [openSessions, setOpenSessions] = useState({});
+    const handleSessionToggle = (id) => {
+        setOpenSessions(prevState => {
+            const newState = { ...prevState, [id]: !prevState[id] };
+            // 세션이 열릴 때 스크롤 비활성화
+            if (Object.values(newState).includes(true)) {
+                document.body.classList.add('modal-open');
+            } else {
+                document.body.classList.remove('modal-open');
+            }
+            return newState;
+        });
+    };
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
+
+    const handlePopupOpen = async (item) => {
         setSelectedItem(item);
+        setEditItem({
+            lostName: item.lostName,
+            date: item.date,
+            location: item.location,
+            description: item.description,
+            category: item.category
+        });
+        if (item && item.imgFilename) {
+            // 이전 이미지 URL 해제
+            if (imageUrlRef.current) {
+                URL.revokeObjectURL(imageUrlRef.current);
+            }
+            // 새로운 이미지 URL 생성
+            const url = await fetchImageUrl(item.imgFilename);
+            setImageUrl(url);
+            imageUrlRef.current = url;
+        }
         setShowPopup(true);
+        document.body.classList.add('modal-open');
     };
 
     const handlePopupClose = () => {
-        setShowPopup(false);
-        setSelectedItem(null);
-        setPopupImageUrl(null); // 팝업 이미지 URL 초기화
+        // 이전 이미지 URL 해제
+        if (imageUrlRef.current) {
+            URL.revokeObjectURL(imageUrlRef.current);
+            imageUrlRef.current = null;
+        }
+        setImageUrl(null); // 상태 초기화
+        setShowPopup(false); // 팝업 닫기
+        document.body.classList.remove('modal-open');
     };
 
     const itemsPerPage = 10;
@@ -27,9 +70,9 @@ function Management(){
 
         ];
     const [loading, setLoading] = useState(false);
-    const [item, setItem] = useState(null);
+
     const [imageUrl, setImageUrl] = useState(null);
-    const [imageName, setImageName] = useState('');
+
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
@@ -48,7 +91,7 @@ function Management(){
                 }
             };
 
-            const maxId = 12; // 실제 최대 ID로 교체
+            const maxId = 15; // 실제 최대 ID로 교체
             const fetchedItems = [];
             for (let id = 1; id <= maxId; id++) {
                 const item = await fetchItem(id);
@@ -67,7 +110,8 @@ function Management(){
     // 이미지 URL을 가져오는 함수
     const fetchImageUrl = async (filename) => {
         try {
-            const response = await axios.get(`/lost-items/display/${filename}`, {
+            const timestamp = new Date().getTime(); // 현재 타임스탬프 추가
+            const response = await axios.get(`/lost-items/display/${filename}?${timestamp}`, {
                 responseType: 'blob', // 이미지 데이터를 Blob으로 받음
             });
             const url = URL.createObjectURL(response.data);
@@ -232,14 +276,56 @@ function Management(){
 
     const [checkedItems, setCheckedItems] = useState([]);
 
+    const [editItem, setEditItem] = useState({});
+
+    const handleEditChange = (field, value) => {
+        setEditItem(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleEditSubmit = async (e, itemId) => {
+        e.preventDefault();
+
+        const dateTime = new Date(editItem.date);
+        let formattedDate = dateTime.toISOString().slice(0, 19);
+        const finalDate = formattedDate;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('lostItem', JSON.stringify({
+            ...editItem,
+            date: finalDate
+        }));
+
+        try {
+            await axios.put(`/lost-items/${itemId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            // 서버에서 업데이트 성공 후, 상태 갱신
+            setFilteredItems(prevState =>
+                prevState.map(item =>
+                    item.lostID === itemId ? { ...item, ...editItem } : item
+                )
+            );
+
+            // 페이지 새로고침
+            window.location.reload();
+
+            handleSessionToggle(itemId); // 세션 닫기
+        } catch (error) {
+            console.error('Error updating item:', error.response ? error.response.data : error.message);
+        }
+    };
+
+
     if (loading) {
         return <div>Loading...</div>;
     }
-
-
-
-
-
 
     return(
         <div className="ad-div">
@@ -424,16 +510,78 @@ function Management(){
                                     </div>
 
                                     <div className="ad-main-cate-admin-box">
-                                        <div className="frame-982">
-                                            <div className="frame-983">
-                                                <div className="frame-980">
-                                                    <div className="smbtn">삭제</div>
-                                                </div>
-                                                <div className="frame-981">
-                                                    <div className="smbtn">수정</div>
+
+                                        <button
+                                            className="frame-983"
+                                            onClick={() => handleSessionToggle(item.lostID)}
+                                        >
+                                            <div className="frame-981">
+                                                <div className="smbtn">수정</div>
+                                            </div>
+                                        </button>
+                                        {/* 세션 내용 */}
+                                        {openSessions[item.lostID] && (
+                                            <div className="session-overlay">
+                                                <div className="session-content">
+                                                    <form onSubmit={(e) => handleEditSubmit(e, item.lostID)}>
+                                                        <label>
+                                                            분류:
+                                                            <input
+                                                                type="text"
+                                                                value={editItem.category || ''}
+                                                                onChange={(e) => handleEditChange('category', e.target.value)}
+                                                            />
+                                                        </label>
+                                                        <label>
+                                                            이름:
+                                                            <input
+                                                                type="text"
+                                                                value={editItem.lostName || ''}
+                                                                onChange={(e) => handleEditChange('lostName', e.target.value)}
+                                                            />
+                                                        </label>
+                                                        <label>
+                                                            장소:
+                                                            <input
+                                                                type="text"
+                                                                value={editItem.location || ''}
+                                                                onChange={(e) => handleEditChange('location', e.target.value)}
+                                                            />
+                                                        </label>
+                                                        <label>
+                                                            날짜 및 시간:
+                                                            <input
+                                                                type="datetime-local"
+                                                                value={editItem.date ? new Date(editItem.date).toISOString().slice(0, 16) : ''}
+                                                                onChange={(e) => handleEditChange('date', e.target.value)}
+                                                            />
+                                                        </label>
+
+
+                                                        <label>
+                                                            설명:
+                                                            <textarea
+                                                                value={editItem.description || ''}
+                                                                onChange={(e) => handleEditChange('description', e.target.value)}
+                                                            />
+                                                        </label>
+                                                        <label>
+                                                            이미지:
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={handleFileChange}
+                                                            />
+                                                        </label>
+                                                        <button type="submit">저장</button>
+                                                    </form>
+                                                    <button className="session-close-button"
+                                                            onClick={() => handleSessionToggle(item.lostID)}>닫기
+                                                    </button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        )}
+
                                     </div>
 
                                 </div>
@@ -494,10 +642,14 @@ function Management(){
                         <p><strong>이름:</strong> {selectedItem.lostName}</p>
                         <p><strong>장소:</strong> {selectedItem.location}</p>
                         <p><strong>날짜:</strong> {selectedItem.date}</p>
+                        <p><strong>세부사항</strong></p>
+                        <pre>
+                            {selectedItem.description}
+                        </pre>
                         <p><strong>이미지:</strong></p>
                         <p>Image Name: {selectedItem.imgFilename}</p>
                         {imageUrl ? (
-                            <img src={imageUrl} alt={selectedItem.imgFilename}/>
+                            <img src={imageUrl} alt={selectedItem.imgFilename} className="popup-image"/>
                         ) : (
                             <p>이미지를 불러오는 중입니다...</p>
                         )}
