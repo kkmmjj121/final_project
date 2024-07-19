@@ -3,51 +3,65 @@ import '../styles/Management.css';
 import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
 import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일 import
+import axios from 'axios';
 
 function Management(){
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    const handlePopupOpen = (item) => {
+        setSelectedItem(item);
+        setShowPopup(true);
+    };
+
+    const handlePopupClose = () => {
+        setShowPopup(false);
+        setSelectedItem(null);
+    };
+
+
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const items = [
-            {"category": "동물", "name": "et", "person": "준영", "place": "수원시 팔달구", "date": "2024-05-25", "status": "반환완료"},
-            {"category": "식물", "name": "quibusdam", "person": "상현", "place": "서천군", "date": "2024-04-09", "status": "경찰서 이관"},
-            {"category": "기타", "name": "quam", "person": "명자", "place": "성남시", "date": "2024-01-26", "status": "경찰서 이관"},
-            {"category": "식물", "name": "voluptatem", "person": "은지", "place": "원주시", "date": "2024-01-23", "status": "보관중"},
-            {"category": "동물", "name": "similique", "person": "병철", "place": "부여군", "date": "2024-02-29", "status": "경찰서 이관"},
-            {"category": "물건", "name": "velit", "person": "서연", "place": "안산시", "date": "2024-06-30", "status": "반환완료"},
-            {"category": "동물", "name": "perspiciatis", "person": "미숙", "place": "남양주시", "date": "2024-02-22", "status": "반환완료"},
-            {"category": "동물", "name": "deleniti", "person": "영식", "place": "의왕시", "date": "2024-02-18", "status": "경찰서 이관"},
-            {"category": "물건", "name": "qui", "person": "예원", "place": "부천시", "date": "2024-03-12", "status": "반환완료"},
-            {"category": "기타", "name": "eveniet", "person": "정희", "place": "동해시", "date": "2024-04-01", "status": "경찰서 이관"},
-            {"category": "식물", "name": "ad", "person": "민서", "place": "오산시", "date": "2024-03-17", "status": "경찰서 이관"},
-            {"category": "기타", "name": "officia", "person": "정훈", "place": "고양시 일산동구", "date": "2024-07-10", "status": "보관중"},
-            {"category": "식물", "name": "deserunt", "person": "예원", "place": "고성군", "date": "2024-05-28", "status": "경찰서 이관"},
-            {"category": "기타", "name": "reiciendis", "person": "수빈", "place": "청주시 상당구", "date": "2024-01-25", "status": "보관중"},
-            {"category": "물건", "name": "dignissimos", "person": "정훈", "place": "정읍시", "date": "2024-07-08", "status": "보관중"},
-            {"category": "동물", "name": "odio", "person": "영수", "place": "용인시 처인구", "date": "2024-04-06", "status": "보관중"},
-            {"category": "동물", "name": "eum", "person": "예은", "place": "단양군", "date": "2024-03-27", "status": "보관중"},
-            {"category": "식물", "name": "ipsa", "person": "지은", "place": "성남시", "date": "2024-04-22", "status": "경찰서 이관"},
-            {"category": "동물", "name": "aliquam", "person": "영미", "place": "단양군", "date": "2024-04-20", "status": "반환완료"},
-            {"category": "식물", "name": "nam", "person": "민재", "place": "안성시", "date": "2024-05-14", "status": "반환완료"},
-            {"category": "동물", "name": "incidunt", "person": "주원", "place": "태백시", "date": "2024-04-24", "status": "경찰서 이관"},
-            {"category": "동물", "name": "a", "person": "도현", "place": "포천시", "date": "2024-02-15", "status": "보관중"},
-            {"category": "식물", "name": "consequatur", "person": "준서", "place": "의정부시", "date": "2024-03-27", "status": "반환완료"},
-            {"category": "물건", "name": "omnis", "person": "시우", "place": "부천시 원미구", "date": "2024-02-26", "status": "반환완료"},
-            {"category": "기타", "name": "dolores", "person": "서윤", "place": "부여군", "date": "2024-07-08", "status": "반환완료"},
-            {"category": "동물", "name": "veniam", "person": "경수", "place": "이천시", "date": "2024-05-26", "status": "보관중"},
-            {"category": "물건", "name": "maiores", "person": "건우", "place": "서천군", "date": "2024-05-04", "status": "반환완료"},
-            {"category": "물건", "name": "quam", "person": "성수", "place": "양주시", "date": "2024-04-21", "status": "반환완료"},
-            {"category": "식물", "name": "neque", "person": "성수", "place": "수원시 장안구", "date": "2024-05-08", "status": "반환완료"},
-            {"category": "기타", "name": "voluptatem", "person": "유리", "place": "성남시", "date": "2024-01-18", "status": "보관중"},
-            {"category": "물건", "name": "veritatis", "person": "예림", "place": "고양시 덕양구", "date": "2024-03-14", "status": "보관중"},
-            {"category": "동물", "name": "facere", "person": "지훈", "place": "전주시 완산구", "date": "2024-04-07", "status": "보관중"},
-            {"category": "물건", "name": "voluptatem", "person": "은지", "place": "남양주시", "date": "2024-06-13", "status": "반환완료"},
-            {"category": "기타", "name": "nemo", "person": "승우", "place": "평택시", "date": "2024-05-23", "status": "경찰서 이관"},
-            {"category": "식물", "name": "eum", "person": "지은", "place": "광주시", "date": "2024-04-12", "status": "반환완료"},
-            {"category": "동물", "name": "id", "person": "석현", "place": "김해시", "date": "2024-06-20", "status": "보관중"}
-        ]
 
-    ;
+        ];
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        const fetchItems = async () => {
+            setLoading(true);
 
+            // 단일 ID에 대해 데이터를 요청
+            const fetchItem = async (id) => {
+                try {
+                    const response = await axios.get(`/lost-items/${id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    return response.data;
+                } catch (err) {
+                    console.log(`Error fetching ID ${id}: ${err.message}`);
+                    return null; // ID가 존재하지 않을 경우 null 반환
+                }
+            };
+
+            // 최대 ID를 결정하고 ID 범위에 대해 요청
+            const maxId = 12; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
+
+            const fetchedItems = [];
+            for (let id = 1; id <= maxId; id++) {
+                const item = await fetchItem(id);
+                if (item) {
+                    fetchedItems.push(item); // 유효한 아이템만 추가
+                }
+            }
+
+            setFilteredItems(fetchedItems);
+            setLoading(false);
+        };
+
+        fetchItems();
+    }, []);
     const clearCheckedItems = () => {
         setCheckedItems([]); // 체크된 아이템 초기화
     };
@@ -191,6 +205,9 @@ function Management(){
 
     const [checkedItems, setCheckedItems] = useState([]);
 
+    const getImageUrl = (filename) => {
+        return `/lost-items/display/${filename}`; // 실제 API URL로 변경
+    };
 
     return(
         <div className="ad-div">
@@ -315,10 +332,7 @@ function Management(){
                             <div className="ad-main-cate-name">습득물 이름</div>
                             <div className="ad-main-cate-dot"></div>
                         </div>
-                        <div className="ad-main-cate-person-box">
-                            <div className="ad-main-cate-person">분실자 이름</div>
-                            <div className="ad-main-cate-dot"></div>
-                        </div>
+
                         <div className="ad-main-cate-place-box">
                             <div className="ad-main-cate-place">습득장소</div>
                             <div className="ad-main-cate-dot"></div>
@@ -327,10 +341,7 @@ function Management(){
                             <div className="ad-main-cate-date">습득일</div>
                             <div className="ad-main-cate-dot"></div>
                         </div>
-                        <div className="ad-main-cate-result-box">
-                            <div className="ad-main-cate-result">처리결과</div>
-                            <div className="ad-main-cate-dot"></div>
-                        </div>
+
                         <div className="ad-main-cate-admin-box">
                             <div className="ad-main-cate-admin">게시글 관리</div>
                         </div>
@@ -351,28 +362,27 @@ function Management(){
 
                                         </div>
 
-                                    <div className="ad-main-cate-index-box">
-                                        <div className="div2">{index}</div>
-                                    </div>
+                                    <button
+                                        className="ad-main-cate-index-box"
+                                        onClick={() => handlePopupOpen(item)}
+                                    >
+                                        <div className="div2">{item.lostID}</div>
+                                    </button>
                                     <div className="ad-main-cate-cate-box">
                                         <div className="frame-950">
 
-                                            <div className="div3">{item.place}</div>
+                                        <div className="div3">{item.category}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-name-box">
-                                        <div className="div2">{item.name}</div>
+                                        <div className="div2">{item.lostName}</div>
                                     </div>
-                                    <div className="ad-main-cate-person-box">
-                                        <div className="frame-950">
-                                            <div className="div3">{item.person}</div>
-                                        </div>
-                                    </div>
+
                                     <div className="ad-main-cate-place-box">
                                         <div className="frame-950">
                                             <img className="marker-pin-01" src="/images/marker-pin-01.png"
                                                  alt="marker pin"/>
-                                            <div className="div3">{item.place}</div>
+                                            <div className="div3">{item.location}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-date-box">
@@ -380,11 +390,7 @@ function Management(){
                                             <div className="div3">{item.date}</div>
                                         </div>
                                     </div>
-                                    <div className="ad-main-cate-result-box">
-                                        <div className="frame-952">
-                                            <div className="div4">{item.status}</div>
-                                        </div>
-                                    </div>
+
                                     <div className="ad-main-cate-admin-box">
                                         <div className="frame-982">
                                             <div className="frame-983">
@@ -444,7 +450,26 @@ function Management(){
                     </div>
                 </div>
             </div>
+            {showPopup && selectedItem && (
+                <div className="popup-overlay">
+                    <div className="popup-content">
+                        <button className="popup-close" onClick={handlePopupClose}>X</button>
+                        <h2>상세 정보</h2>
+                        <p><strong>등록번호:</strong> {selectedItem.lostID}</p>
+                        <p><strong>분류:</strong> {selectedItem.category}</p>
+                        <p><strong>이름:</strong> {selectedItem.lostName}</p>
+                        <p><strong>장소:</strong> {selectedItem.location}</p>
+                        <p><strong>날짜:</strong> {selectedItem.date}</p>
+                        {selectedItem.imgFilename && (
+                            <div className="popup-image">
+                                <img src={getImageUrl(selectedItem.imageFilename)} alt="상세 이미지" />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
+
 
     );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../styles/Login.css';
@@ -44,6 +44,64 @@ const Login = () => {
         .catch(error => {
             console.error('Error:', error);
         });
+    useEffect(() => {
+        const loadKakaoSDK = () => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://developers.kakao.com/sdk/js/kakao.js';
+                script.onload = () => {
+                    if (window.Kakao) {
+                        window.Kakao.init('d34e9b7ffd72249b06fccc94be11405b'); // 여기에 실제 JavaScript 키를 입력하세요.
+                        resolve(window.Kakao);
+                    } else {
+                        reject(new Error('Kakao SDK 로드 실패'));
+                    }
+                };
+                script.onerror = () => reject(new Error('Kakao SDK 로드 실패'));
+                document.head.appendChild(script);
+            });
+        };
+
+        loadKakaoSDK().then(() => {
+            console.log('Kakao SDK 로드 및 초기화 성공');
+        }).catch((error) => {
+            console.error(error);
+        });
+    }, []);
+
+
+
+    const loginWithKakao = () => {
+        if (!window.Kakao) {
+            console.error('Kakao SDK가 초기화되지 않았습니다.');
+            return;
+        }
+
+        window.Kakao.Auth.login({
+            success: async (authObj) => {
+                console.log(authObj);
+                try {
+                    const response = await axios.post('/social-login', {
+                        provider: 'kakao',
+                        token: authObj.access_token
+                    });
+                    if (response.status === 200) {
+                        console.log('소셜 로그인 성공');
+
+                    }
+                } catch (error) {
+                    console.error('소셜 로그인 실패', error);
+                }
+            },
+            fail: (err) => {
+                console.error(err);
+            },
+        });
+    };
+
+
+
+
 
     return (
         <div className="login-full-container">
@@ -108,10 +166,11 @@ const Login = () => {
                         <img src="/images/google_icon.png" alt="Google" className="social-icon"/>
                         Google로 시작하기
                     </button>
-                    <button className="social-button kakao-button">
+                    <button className="social-button kakao-button" onClick={loginWithKakao}>
                         <img src="/images/kakao_icon.png" alt="Kakao" className="social-icon"/>
                         Kakao로 시작하기
                     </button>
+
                     <button className="social-button naver-button">
                         <img src="/images/naver_icon.png" alt="Naver" className="social-icon"/>
                         Naver로 시작하기

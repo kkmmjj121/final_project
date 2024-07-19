@@ -2,28 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import '../styles/Lost.css';
 import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
-import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일 import
+import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일
+import axios from 'axios';
 function Lost() {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const items = [
-        { category: '동물', name: '삼색 냥이', place: '옆집', date: '2024-07-15', status: '보관중' },
-        { category: '동물', name: '강아지', place: '옆집', date: '2024-07-16', status: '반환완료' },
-        { category: '기타', name: '오래된 분실물', place: '분실물센터앞', date: '2024-07-14', status: '경찰청 이관' },
-        { category: '기타', name: '분실 스마트폰', place: '카페', date: '2024-07-17', status: '보관중' },
-        { category: '가방', name: '검정색 백팩', place: '도서관', date: '2024-07-18', status: '보관중' },
-        { category: '가방', name: '분실 레드 가방', place: '공원', date: '2024-07-19', status: '보관중' },
-        { category: '가방', name: '회색 쇼퍼백', place: '마트', date: '2024-07-20', status: '보관중' },
-        { category: '모자', name: '분실 화이트 캡', place: '체육관', date: '2024-07-21', status: '보관중' },
-        { category: '모자', name: '블랙 헬멧', place: '서핑장', date: '2024-07-22', status: '보관중' },
-        { category: '모자', name: '스트로포모자', place: '해변', date: '2024-07-23', status: '보관중' },
-        { category: '서류', name: '주민등록증', place: '사무실', date: '2024-07-24', status: '보관중' },
-        { category: '서류', name: '운전면허증', place: '차량', date: '2024-07-25', status: '보관중' },
-        { category: '서류', name: '학생증', place: '학교', date: '2024-07-26', status: '보관중' },
-        { category: '전자기기', name: '아이폰', place: '카페', date: '2024-07-27', status: '보관중' },
-        { category: '전자기기', name: '갤럭시 태블릿', place: '도서관', date: '2024-07-28', status: '보관중' },
-        // 추가 항목들...
-    ];
+    const items=[];
+
+    const [id, setId] = useState(1); // 초기값으로 1을 설정
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
 
 
@@ -43,6 +31,44 @@ function Lost() {
     const handleFirstPage = () => {
         setCurrentPage(1);
     };
+    useEffect(() => {
+        const fetchItems = async () => {
+            setLoading(true);
+
+            // 단일 ID에 대해 데이터를 요청
+            const fetchItem = async (id) => {
+                try {
+                    const response = await axios.get(`/lost-items/${id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    return response.data;
+                } catch (err) {
+                    console.log(`Error fetching ID ${id}: ${err.message}`);
+                    return null; // ID가 존재하지 않을 경우 null 반환
+                }
+            };
+
+            // 최대 ID를 결정하고 ID 범위에 대해 요청
+            const maxId = 10; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
+
+            const fetchedItems = [];
+            for (let id = 1; id <= maxId; id++) {
+                const item = await fetchItem(id);
+                if (item) {
+                    fetchedItems.push(item); // 유효한 아이템만 추가
+                }
+            }
+
+            setFilteredItems(fetchedItems);
+            setLoading(false);
+        };
+
+        fetchItems();
+    }, []);
+
+
 
 
     const getPageNumbers = () => {
@@ -278,12 +304,12 @@ function Lost() {
                                     <div className="div">{item.category}</div>
                                 </div>
                                 <div className="frame-9452">
-                                    <div className="div2">{item.name}</div>
+                                    <div className="div2">{item.lostName}</div>
                                 </div>
                                 <div className="frame-947">
                                     <div className="frame-950">
                                         <img className="marker-pin-01" src="/images/marker-pin-01.png" alt="marker pin"/>
-                                        <div className="div3">{item.place}</div>
+                                        <div className="div3">{item.location}</div>
                                     </div>
                                 </div>
                                 <div className="frame-946">
