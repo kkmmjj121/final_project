@@ -1,0 +1,501 @@
+.taxi-div,
+.taxi-div * {
+    box-sizing: border-box;
+}
+.taxi-div {
+    width : 1200px;
+    max-width: 1200px;
+    background: #ffffff;
+    height: 1080px;
+    position: relative;
+    overflow-y: hidden;
+    margin: 0 auto 10px auto;
+    overflow-x: auto;
+}
+.taxi-entire {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    align-items: center;
+    justify-content: center;
+    width: 901.25px;
+    position: absolute;
+    left: calc(50% - 451px);
+    top: calc(50% - 405.5px);
+}
+.taxi-top {
+    background: #ffffff;
+    border-radius: 24px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1px;
+    padding: 24px 0px 24px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-subtitle {
+    color: #283593;
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    position: relative;
+}
+.taxi-title {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 36px;
+    font-weight: 500;
+    position: relative;
+}
+.taxi-title-explain {
+    color: #5d5d5d;
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    position: relative;
+}
+.taxi-main {
+    background: #ffffff;
+    border-radius: 30px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1.25px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-middle {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-video-frame {
+    border-radius: 30px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1.25px;
+    flex-shrink: 0;
+    width: 370px;
+    height: 370px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-live {
+    background: rgba(93, 93, 93, 0.75);
+    border-radius: 56.25px;
+    padding: 2.5px 7.5px 2.5px 7.5px;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    left: 22.5px;
+    top: 22.5px;
+}
+.taxi-red {
+    background: #ff0000;
+    border-radius: 56.25px;
+    flex-shrink: 0;
+    width: 10px;
+    height: 10px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-live-text {
+    color: #ffffff;
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: 500;
+    position: relative;
+}
+.taxi-effect {
+    background: rgba(93, 93, 93, 0.75);
+    border-radius: 56.25px;
+    padding: 2.5px 7.5px 2.5px 7.5px;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+    position: absolute;
+    right: 22.5px;
+    top: 22.5px;
+}
+.taxi-effect-text {
+    color: #ffffff;
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 20px;
+    line-height: 20px;
+    font-weight: 500;
+    position: relative;
+}
+.taxi-middle-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-waiting {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-waiting-frame {
+    background: #fafafa;
+    border-radius: 30px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1.25px;
+    flex-shrink: 0;
+    width: 225px;
+    height: 175px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-waiting-container {
+    display: flex;
+    flex-direction: row;
+    gap: 41.25px;
+    align-items: flex-end;
+    justify-content: flex-start;
+    position: absolute;
+    left: 22.5px;
+    top: 22.5px;
+}
+.taxi-waiting-container-left {
+    display: flex;
+    flex-direction: column;
+    gap: 57.5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 73.75px;
+    position: relative;
+}
+.taxi-waiting-text {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    position: relative;
+    align-self: stretch;
+    white-space: nowrap;
+}
+.taxi-waiting-image {
+    background: #283593;
+    border-radius: 12.5px;
+    flex-shrink: 0;
+    width: 45px;
+    height: 45px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-user-multiple-group-close-geometric-human-multiple-person-up-user {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: calc(50% - 15px);
+    top: calc(50% - 15px);
+    overflow: hidden;
+}
+.taxi-user-multiple-group-close-geometric-human-multiple-person-up-user2 {
+    width: 92.86%;
+    height: 85.71%;
+    position: absolute;
+    right: 3.57%;
+    left: 3.57%;
+    bottom: 3.57%;
+    top: 10.71%;
+    overflow: visible;
+}
+.taxi-number {
+    display: flex;
+    flex-direction: row;
+    gap: 0px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-digit {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 80px;
+    line-height: 0px;
+    font-weight: 700;
+    position: relative;
+}
+.taxi-span {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    position: relative;
+}
+.taxi-car-taxi-1-transportation-travel-taxi-transport-cab-car {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: calc(50% - 15px);
+    top: calc(50% - 15px);
+    overflow: hidden;
+}
+.taxi-car-taxi-1-transportation-travel-taxi-transport-cab-car2 {
+    width: 92.86%;
+    height: 75%;
+    position: absolute;
+    right: 3.57%;
+    left: 3.57%;
+    bottom: 10.71%;
+    top: 14.29%;
+    overflow: visible;
+}
+.taxi-service-container {
+    background: #fafafa;
+    border-radius: 30px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1.25px;
+    flex-shrink: 0;
+    width: 470px;
+    height: 175px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-sevice-frame {
+    display: flex;
+    flex-direction: row;
+    gap: 117.5px;
+    align-items: flex-end;
+    justify-content: flex-start;
+    position: absolute;
+    left: 22.5px;
+    top: 22.5px;
+}
+.taxi-service {
+    display: flex;
+    flex-direction: column;
+    gap: 57.5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 92.5px;
+    position: relative;
+}
+.taxi-service-text {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    position: relative;
+    align-self: stretch;
+    white-space: nowrap;
+}
+.taxi-service-condition {
+    color: #5c6bc0;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 45px;
+    line-height: 45px;
+    font-weight: 700;
+    position: relative;
+    align-self: stretch;
+}
+.taxi-btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    width: 213.75px;
+    position: relative;
+}
+.taxi-btn-frame {
+    display: flex;
+    flex-direction: row;
+    gap: 53.75px;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-btn-ex {
+    color: rgba(93, 93, 93, 0.75);
+    text-align: left;
+    font-family: "NotoSans-Light", sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    position: relative;
+    width: 97.5px;
+    white-space: nowrap;
+}
+.taxi-slide-btn {
+    flex-shrink: 0;
+    background: #cacaca;
+    border-radius: 21.88px;
+    width: 53.59px;
+    height: 19.69px;
+    position: absolute;
+    left: 160px;
+    top: 7.66px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.taxi-slide-btn-on {
+    background: #c5cae9;
+}
+.taxi-slider {
+    width: 35px;
+    height: 35px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: -7px;
+    left: -7px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/*.taxi-slider-off {*/
+/*    transform: translateX(0);*/
+/*}*/
+
+.taxi-slider-on {
+    background: #5c6bc0;
+    transform: translateX(30px);
+}
+.taxi-rectangle-6 {
+    background: #cacaca;
+    border-radius: 21.88px;
+    width: 53.59px;
+    height: 19.69px;
+    position: absolute;
+    left: 160px;
+    top: 7.66px;
+}
+.taxi-ellipse-16 {
+    background: #ffffff;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    left: 151.25px;
+    top: 0px;
+    box-shadow: 0px 2.19px 4.38px 0px rgba(0, 0, 0, 0.25);
+}
+.taxi-btn-ex2 {
+    color: rgba(93, 93, 93, 0.75);
+    text-align: left;
+    font-family: "NotoSans-Light", sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    position: relative;
+}
+.taxi-rectangle-7 {
+    background: #c5cae9;
+    border-radius: 21.88px;
+    width: 53.59px;
+    height: 19.69px;
+    position: absolute;
+    left: 151.75px;
+    top: 7.66px;
+}
+.taxi-ellipse-17 {
+    background: #5c6bc0;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    left: 179.09px;
+    top: 0px;
+    box-shadow: 0px 2.19px 4.38px 0px rgba(0, 0, 0, 0.25);
+}
+.taxi-bottom {
+    background: #fafafa;
+    border-radius: 30px;
+    border-style: solid;
+    border-color: #ebebeb;
+    border-width: 1.25px;
+    flex-shrink: 0;
+    width: 861.25px;
+    height: 225px;
+    position: relative;
+    overflow: hidden;
+}
+.taxi-bottom-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 550px;
+    position: absolute;
+    left: 22.5px;
+    top: 22.5px;
+}
+.taxi-bottom-title {
+    color: #000000;
+    text-align: left;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    position: relative;
+    align-self: stretch;
+}
+.taxi-bottom-contents {
+    display: flex;
+    flex-direction: column;
+    gap: 7.5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+.taxi-response {
+    color: rgba(93, 93, 93, 0.75);
+    text-align: left;
+    font-family: "NotoSans-Medium", sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    position: relative;
+    align-self: stretch;
+    white-space: nowrap;
+}
