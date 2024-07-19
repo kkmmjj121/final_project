@@ -8,6 +8,7 @@ import axios from 'axios';
 function Management(){
     const [showPopup, setShowPopup] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [popupImageUrl, setPopupImageUrl] = useState(null); // 팝업 이미지 URL 상태 추가
 
     const handlePopupOpen = (item) => {
         setSelectedItem(item);
@@ -17,8 +18,8 @@ function Management(){
     const handlePopupClose = () => {
         setShowPopup(false);
         setSelectedItem(null);
+        setPopupImageUrl(null); // 팝업 이미지 URL 초기화
     };
-
 
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -26,11 +27,13 @@ function Management(){
 
         ];
     const [loading, setLoading] = useState(false);
+    const [item, setItem] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageName, setImageName] = useState('');
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
 
-            // 단일 ID에 대해 데이터를 요청
             const fetchItem = async (id) => {
                 try {
                     const response = await axios.get(`/lost-items/${id}`, {
@@ -41,18 +44,16 @@ function Management(){
                     return response.data;
                 } catch (err) {
                     console.log(`Error fetching ID ${id}: ${err.message}`);
-                    return null; // ID가 존재하지 않을 경우 null 반환
+                    return null;
                 }
             };
 
-            // 최대 ID를 결정하고 ID 범위에 대해 요청
-            const maxId = 12; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
-
+            const maxId = 12; // 실제 최대 ID로 교체
             const fetchedItems = [];
             for (let id = 1; id <= maxId; id++) {
                 const item = await fetchItem(id);
                 if (item) {
-                    fetchedItems.push(item); // 유효한 아이템만 추가
+                    fetchedItems.push(item);
                 }
             }
 
@@ -62,6 +63,32 @@ function Management(){
 
         fetchItems();
     }, []);
+
+    // 이미지 URL을 가져오는 함수
+    const fetchImageUrl = async (filename) => {
+        try {
+            const response = await axios.get(`/lost-items/display/${filename}`, {
+                responseType: 'blob', // 이미지 데이터를 Blob으로 받음
+            });
+            const url = URL.createObjectURL(response.data);
+            return url;
+        } catch (error) {
+            console.error('Error fetching image:', error);
+            return null;
+        }
+    };
+
+    // selectedItem이 변경될 때마다 이미지 URL을 새로 불러옴
+    useEffect(() => {
+        const loadImage = async () => {
+            if (selectedItem && selectedItem.imgFilename) {
+                const url = await fetchImageUrl(selectedItem.imgFilename);
+                setImageUrl(url);
+            }
+        };
+
+        loadImage();
+    }, [selectedItem]);
     const clearCheckedItems = () => {
         setCheckedItems([]); // 체크된 아이템 초기화
     };
@@ -104,7 +131,7 @@ function Management(){
         setCurrentPage(pageNumber);
         clearCheckedItems();
     };
-    // const [checked, setChecked] = useState(false);
+
 
     const handleCheckboxChangeAll = (event) => {
         if (event.target.checked) {
@@ -192,7 +219,7 @@ function Management(){
         setStartDate(null);
         setEndDate(null);
     };
-    const [checked, setChecked] = useState(false);
+
 
     const handleCheckboxChange = (index) => {
         // 체크된 아이템의 인덱스가 이미 checkedItems 배열에 있으면 제거하고, 없으면 추가합니다.
@@ -205,9 +232,14 @@ function Management(){
 
     const [checkedItems, setCheckedItems] = useState([]);
 
-    const getImageUrl = (filename) => {
-        return `/lost-items/display/${filename}`; // 실제 API URL로 변경
-    };
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+
+
+
+
 
     return(
         <div className="ad-div">
@@ -453,17 +485,21 @@ function Management(){
             {showPopup && selectedItem && (
                 <div className="popup-overlay">
                     <div className="popup-content">
-                        <button className="popup-close" onClick={handlePopupClose}>X</button>
+                        <button className="popup-close" onClick={handlePopupClose}>
+                            X
+                        </button>
                         <h2>상세 정보</h2>
                         <p><strong>등록번호:</strong> {selectedItem.lostID}</p>
                         <p><strong>분류:</strong> {selectedItem.category}</p>
                         <p><strong>이름:</strong> {selectedItem.lostName}</p>
                         <p><strong>장소:</strong> {selectedItem.location}</p>
                         <p><strong>날짜:</strong> {selectedItem.date}</p>
-                        {selectedItem.imgFilename && (
-                            <div className="popup-image">
-                                <img src={getImageUrl(selectedItem.imageFilename)} alt="상세 이미지" />
-                            </div>
+                        <p><strong>이미지:</strong></p>
+                        <p>Image Name: {selectedItem.imgFilename}</p>
+                        {imageUrl ? (
+                            <img src={imageUrl} alt={selectedItem.imgFilename}/>
+                        ) : (
+                            <p>이미지를 불러오는 중입니다...</p>
                         )}
                     </div>
                 </div>

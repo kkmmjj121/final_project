@@ -51,7 +51,7 @@ function Lost() {
             };
 
             // 최대 ID를 결정하고 ID 범위에 대해 요청
-            const maxId = 10; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
+            const maxId = 20; // DB에서 실제 최대 ID를 결정할 수 있으면 동적으로 변경
 
             const fetchedItems = [];
             for (let id = 1; id <= maxId; id++) {
