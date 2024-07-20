@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import '../styles/Management.css';
 import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
@@ -72,40 +72,51 @@ function Management(){
     const [loading, setLoading] = useState(false);
 
     const [imageUrl, setImageUrl] = useState(null);
+    const [error, setError] = useState(null);
+    const fetchItemsBatch = useCallback(async (ids) => {
+        try {
+            const requests = ids.map(id => axios.get(`/lost-items/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }));
+            const responses = await Promise.all(requests);
+            return responses.map(response => response.data).filter(data => data && data.lostID);
+        } catch (err) {
+            console.error('Error fetching items batch:', err);
+            throw err;
+        }
+    }, []);
 
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
+            setError(null);
 
-            const fetchItem = async (id) => {
-                try {
-                    const response = await axios.get(`/lost-items/${id}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    });
-                    return response.data;
-                } catch (err) {
-                    console.log(`Error fetching ID ${id}: ${err.message}`);
-                    return null;
-                }
-            };
+            const maxId = 100;
+            const batchSize = 20; // 한 번에 요청할 ID 수
+            const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 
-            const maxId = 15; // 실제 최대 ID로 교체
-            const fetchedItems = [];
-            for (let id = 1; id <= maxId; id++) {
-                const item = await fetchItem(id);
-                if (item) {
-                    fetchedItems.push(item);
+            try {
+                const results = [];
+                for (let i = 0; i < ids.length; i += batchSize) {
+                    const batchIds = ids.slice(i, i + batchSize);
+                    const batchItems = await fetchItemsBatch(batchIds);
+                    results.push(...batchItems);
                 }
+                setFilteredItems(results);
+            } catch (error) {
+                setError('An error occurred while fetching items.');
+                console.error('Error fetching items:', error);
+            } finally {
+                setLoading(false);
             }
-
-            setFilteredItems(fetchedItems);
-            setLoading(false);
         };
 
         fetchItems();
-    }, []);
+    }, [fetchItemsBatch]);
+
+
 
     // 이미지 URL을 가져오는 함수
     const fetchImageUrl = async (filename) => {
@@ -321,6 +332,18 @@ function Management(){
             console.error('Error updating item:', error.response ? error.response.data : error.message);
         }
     };
+    const handleDeleteItem = async (itemId) => {
+        try {
+            await axios.delete(`/lost-items/${itemId}`, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            setFilteredItems(prevState => prevState.filter(item => item.lostID !== itemId));
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting item:', error.response ? error.response.data : error.message);
+        }
+    };
+
 
 
     if (loading) {
@@ -575,6 +598,8 @@ function Management(){
                                                         </label>
                                                         <button type="submit">저장</button>
                                                     </form>
+                                                    <button onClick={() => handleDeleteItem(item.lostID)}>삭제</button>
+
                                                     <button className="session-close-button"
                                                             onClick={() => handleSessionToggle(item.lostID)}>닫기
                                                     </button>
