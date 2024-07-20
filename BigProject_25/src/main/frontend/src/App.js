@@ -11,6 +11,8 @@ import Lost from "./components/Lost";
 import Items from "./components/Items";
 import Management from "./components/Management";
 import Register from "./components/Register"
+import IdInquiry from "./components/IdInquiry"
+import PwInquiry from "./components/PwInquiry"
 
 function App() {
     const [agreed, setAgreed] = useState(false);
@@ -28,6 +30,8 @@ function App() {
               <Route path="/Lost" element={<Lost/>} />
               <Route path="/Management" element={<Management/>} />
               <Route path="/Register" element={<Register/>}/>
+              <Route path="/IdInquiry" element={<IdInquiry/>}/>
+              <Route path="/PwInquiry" element={<PwInquiry/>}/>
           </Routes>
       </Router>
   );

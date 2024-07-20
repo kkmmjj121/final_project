@@ -96,7 +96,7 @@ function Lost() {
             setLoading(true);
             setError(null);
 
-            const maxId = 20;
+            const maxId = 50;
             const batchSize = 20;
             const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 

@@ -93,7 +93,7 @@ function Management(){
             setLoading(true);
             setError(null);
 
-            const maxId = 20;
+            const maxId = 100;
             const batchSize = 20; // 한 번에 요청할 ID 수
             const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 
