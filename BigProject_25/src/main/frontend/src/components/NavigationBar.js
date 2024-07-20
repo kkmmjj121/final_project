@@ -34,7 +34,7 @@ function NavigationBar() {
                 <Link to='/Management' className="home-right-side-text">분실물등록</Link>
                 <Link to='/Taxi' className="home-right-side-text">택시승강장관리</Link>
                 {isLoggedIn ? (
-                    <button onClick={handleLogout} className="home-right-side-text">로그아웃</button>
+                    <Link to ='/' onClick={handleLogout} className="home-right-side-text">로그아웃</Link>
                 ) : (
                     <Link to='/Login' className="home-right-side-text">로그인</Link>
                 )}

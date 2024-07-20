@@ -93,8 +93,8 @@ function Management(){
             setLoading(true);
             setError(null);
 
-            const maxId = 100;
-            const batchSize = 20; // 한 번에 요청할 ID 수
+            const maxId = 20;
+            const batchSize = 5; // 한 번에 요청할 ID 수
             const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 
             try {
@@ -188,15 +188,7 @@ function Management(){
     };
 
 
-    const handleCheckboxChangeAll = (event) => {
-        if (event.target.checked) {
-            // 전체 선택
-            setCheckedItems(displayedItems.map((item, index) => index)); // 인덱스 배열로 설정
-        } else {
-            // 전체 해제
-            setCheckedItems([]);
-        }
-    };
+
 
     const [startDate, setStartDate] = useState(null); // 시작 날짜 상태
     const [endDate, setEndDate] = useState(null); // 종료 날짜 상태
@@ -399,22 +391,32 @@ function Management(){
                     </div>
                     <div className="ad-main-search-frame">
                         <div className="ad-main-cate">
-                            <div className="ad-main-cate-placeholder">분류</div>
+                            <input
+                                type="text"
+                                className="ad-main-cate-placeholder"
+                                placeholder="분류"
+                            />
                             <div className="ad-main-cate-btn">
-                                <img className="pencil-01" src="pencil-010.svg"/>
+                            <img className="pencil-01" src="pencil-010.svg"/>
                             </div>
                         </div>
                         <div className="ad-main-name">
-                            <div className="ad-main-name-placeholder">습득물</div>
+                            <input
+                                type="text"
+                                className="ad-main-name-placeholder"
+                                placeholder="분실물 이름"
+                            />
                             <div className="ad-main-name-btn">
                                 <img className="pencil-012" src="pencil-011.svg"/>
                             </div>
                         </div>
                         <div className="ad-main-cal-container">
                             <div className="ad-main-cal-frame">
-                                <div className="ad-main-cal-placeholder">습득일</div>
-                                <div className="ad-main-cal-img">
-                                    <img className="calendar3" src="calendar2.svg"/>
+                                <div className="ad-main-cal-placeholder">
+                                    {startDate ? startDate.toLocaleDateString() : '시작 날짜'}
+                                </div>
+                                <div className="calendar-frame" onClick={handleStartDateCalendarClick}>
+                                    <img className="calendar2" src="/images/calendar.png" alt="calendar"/>
                                 </div>
                             </div>
                             <div className="ad-main-ing">~</div>
@@ -453,14 +455,7 @@ function Management(){
                 </div>
                 <div className="ad-main-item-cate">
                     <div className="ad-main-cate2">
-                        <div className="ad-main-cate-checkbox-box">
-                            <div className="ad-main-cate-dot"></div>
-                            <input
-                                type="checkbox"
-                                checked={checkedItems.length === displayedItems.length && displayedItems.length > 0} // 전체 체크 상태를 확인
-                                onChange={handleCheckboxChangeAll}
-                            />
-                        </div>
+
                         <div className="ad-main-cate-index-box">
                             <div className="ad-main-cate-index">등록번호</div>
                             <div className="ad-main-cate-dot"></div>
@@ -492,41 +487,32 @@ function Management(){
                             {displayedItems.map((item, index) => (
                                 <div key={index} className="frame-item">
 
-                                        <div className="ad-main-cate-checkbox-box">
-
-                                            <input
-                                                type="checkbox"
-                                                checked={checkedItems.includes(index)} // 해당 아이템의 인덱스가 checkedItems 배열에 있으면 체크됨
-                                                onChange={() => handleCheckboxChange(index)} // 체크박스가 변경될 때 handleCheckboxChange 함수 호출
-                                            />
 
 
-                                        </div>
-
-                                    <button
+                                    <div
                                         className="ad-main-cate-index-box"
                                         onClick={() => handlePopupOpen(item)}
                                     >
                                         <div className="div2">{item.lostID}</div>
-                                    </button>
-                                    <div className="ad-main-cate-cate-box">
+                                    </div>
+                                    <div className="ad-main-cate-cate-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="frame-950">
 
                                         <div className="div3">{item.category}</div>
                                         </div>
                                     </div>
-                                    <div className="ad-main-cate-name-box">
+                                    <div className="ad-main-cate-name-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="div2">{item.lostName}</div>
                                     </div>
 
-                                    <div className="ad-main-cate-place-box">
+                                    <div className="ad-main-cate-place-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="frame-950">
                                             <img className="marker-pin-01" src="/images/marker-pin-01.png"
                                                  alt="marker pin"/>
                                             <div className="div3">{item.location}</div>
                                         </div>
                                     </div>
-                                    <div className="ad-main-cate-date-box">
+                                    <div className="ad-main-cate-date-box" onClick={() => handlePopupOpen(item)}>
                                     <div className="frame-950">
                                             <div className="div3">{item.date}</div>
                                         </div>
@@ -534,14 +520,14 @@ function Management(){
 
                                     <div className="ad-main-cate-admin-box">
 
-                                        <button
+                                        <div
                                             className="frame-983"
-                                            onClick={() => handleSessionToggle(item.lostID)}
+
                                         >
-                                            <div className="frame-981">
+                                            <div className="frame-981" onClick={() => handleSessionToggle(item.lostID)}>
                                                 <div className="smbtn">수정</div>
                                             </div>
-                                        </button>
+                                        </div>
                                         {/* 세션 내용 */}
                                         {openSessions[item.lostID] && (
                                             <div className="session-overlay">
@@ -612,21 +598,14 @@ function Management(){
                                 </div>
                             ))}
                         </div>
-                        <div className="ad-item-delete-line">
-                        <div className="ad-item-delete-box">
-                                <div className="check-square"></div>
-                                <div className="ad-item-delete-btn">
-                                    <div className="ad-delete-txt">삭제</div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                     <div className="ad-regi-line">
-                        <a href='/Register' className="ad-regi-container">
-                            <div className="ad-regi-btn">
+                        <div className="ad-regi-container">
+                            <a href="/Register" className="ad-regi-btn">
                                 <div className="ad-regi-txt">분실물 등록</div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div className="lost-page">

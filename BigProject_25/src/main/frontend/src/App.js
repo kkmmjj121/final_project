@@ -31,12 +31,12 @@ function App() {
                         <Taxi/>
                     </ProtectedRoute>
                 }/>
-                <Route path="/Lost" element={
+                <Route path="/Management" element={
                     <ProtectedRoute>
-                        <Lost/>
+                        <Management/>
                     </ProtectedRoute>
                 }/>
-                <Route path="/Management" element={<Management/>}/>
+                <Route path="/Lost" element={<Lost />}/>
                 <Route path="/Register" element={<Register/>}/>
                 <Route path="/IdInquiry" element={<IdInquiry/>}/>
                <Route path="/PwInquiry" element={<PwInquiry/>}/>
