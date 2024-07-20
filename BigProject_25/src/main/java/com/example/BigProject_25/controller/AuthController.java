@@ -42,6 +42,15 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/find-user-id")
+    public ResponseEntity<?> findUserIdByEmailAndName(@RequestParam String email, @RequestParam String name) {
+        String userId = authService.getUserIdByEmailAndName(email, name);
+        if (userId != null) {
+            return ResponseEntity.ok(userId);
+        } else {
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다. 다시 한 번 확인해주세요.");
+        }
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody Map<String, String> payload) {
@@ -56,7 +65,7 @@ public class AuthController {
         if (authService.signup(name, email, userID, phoneNumStr, password, captchaResponse)) {
             return ResponseEntity.ok("회원가입 요청이 성공적으로 처리되었습니다. 이메일을 확인하세요.");
         } else {
-            return ResponseEntity.status(400).body("회원가입이 실패했습니다. 입력한 정보가 규칙에 맞는지 확인해주세요.");
+            return ResponseEntity.status(400).body("회원가입이 실패했습니다. 입력한 정보가 규칙에 맞는지 다시 한 번 확인해주세요.");
         }
     }
 
@@ -91,6 +100,23 @@ public class AuthController {
             return ResponseEntity.ok("사용자 인증에 성공했습니다. 로그인이 가능합니다.");
         } else {
             return ResponseEntity.status(400).body("유효하지 않거나 만료된 토큰입니다.");
+        }
+    }
+    @PostMapping("/request-password-reset")
+    public ResponseEntity<?> requestPasswordReset(@RequestParam String userID, @RequestParam String name) {
+        if (authService.requestPasswordReset(userID, name)) {
+            return ResponseEntity.ok("임시 비밀번호가 이메일로 전송되었습니다.");
+        } else {
+            return ResponseEntity.status(404).body("사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam String userID, @RequestParam String oldPassword, @RequestParam String newPassword) {
+        if (authService.changePassword(userID, oldPassword, newPassword)) {
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } else {
+            return ResponseEntity.status(400).body("비밀번호 변경에 실패했습니다.");
         }
     }
 }
