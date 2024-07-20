@@ -66,31 +66,31 @@ const IdInquiry = () => {
 
     return (
         // 화면 전체 범위
-        <div className="idinquiry">
+        <div className="pi-idinquiry">
 
             {/*서비스 영역*/}
-            <div className="id-inquiry-content">
+            <div className="pi-id-inquiry-content">
 
                 {/*로고 영역*/}
-                <div className="logo">
-                    <div className="a-irport">AIrport</div>
+                <div className="pi-logo">
+                    <div className="pi-a-irport">AIrport</div>
                 </div>
 
                 {/*서비스 설명 영역*/}
-                <div className="find-id-title">
-                    <div className="div3">아이디 찾기</div>
-                    <div className="line-32"></div>
-                    <div className="div4">
+                <div className="pi-find-id-title">
+                    <div className="pi-div3">아이디 찾기</div>
+                    <div className="pi-line-32"></div>
+                    <div className="pi-div4">
                         아이디를 찾기 위해서 회원님의 이름과 가입할 때 사용한 이메일을 입력해주세요
                     </div>
                 </div>
 
                 {/*사용자 이름 입력받기*/}
-                <div className="find-id-username">
-                    <div className="user-name">USER NAME</div>
-                    <div className="user-name-input">
+                <div className="pi-find-id-username">
+                    <div className="pi-user-name">USER NAME</div>
+                    <div className="pi-user-name-input">
                         <input
-                            className="input-username"
+                            className="pi-input-username"
                             type="text"
                             name="username"
                             value={userName}
@@ -101,11 +101,11 @@ const IdInquiry = () => {
                 </div>
 
                 {/*사용자 이메일 입력받기*/}
-                <div className="find-id-useremail">
-                    <div className="user-email">USER EMAIL</div>
-                    <div className="user-email-input">
+                <div className="pi-find-id-useremail">
+                    <div className="pi-user-email">USER EMAIL</div>
+                    <div className="pi-user-email-input">
                         <input
-                            className="input-useremail"
+                            className="pi-input-useremail"
                             type="email"
                             name="userEmail"
                             value={userEmail}
@@ -116,52 +116,52 @@ const IdInquiry = () => {
                 </div>
 
                 {/*버튼 + 백엔드에 요청 보내기*/}
-                <button onClick={handleSubmit} className="find-id-btn">
-                    <div className="div">아이디 찾기</div>
+                <button onClick={handleSubmit} className="pi-find-id-btn">
+                    <div className="pi-div">아이디 찾기</div>
                 </button>
             </div>
 
             {/*전체화면과 크기 같은 프레임(배경 어둡게 하기 위해서 제공)*/}
-            {/*<div className="IdInquiry-popup-frame">*/}
-            <div className={isVisible ? 'IdInquiry-popup-frame' : 'hidden'}>
+            {/*<div className="pi-IdInquiry-popup-frame">*/}
+            <div className={isVisible ? 'pi-IdInquiry-popup-frame' : 'pi-hidden'}>
 
                 {/*팝업 창*/}
-                <div className="IdInquiry-popup">
+                <div className="pi-IdInquiry-popup">
 
                     {/*팝업창 로고*/}
-                    <div className="IdInquiry-popup-logo">
-                        <div className="IdInquiry-popup-a-irport">AIrport</div>
+                    <div className="pi-IdInquiry-popup-logo">
+                        <div className="pi-IdInquiry-popup-a-irport">AIrport</div>
                     </div>
 
                     {/*팝업 서비스 영역*/}
-                    <div className="IdInquiry-popup-explain">
+                    <div className="pi-IdInquiry-popup-explain">
 
 
                         {/*아이디 찾기 결과*/}
-                        <div className="IdInquiry-popup-offer">
+                        <div className="pi-IdInquiry-popup-offer">
               <span>
 
                 {/*회원이름 적용*/}
-                  <span className="IdInquiry-popup-offer-text">
+                  <span className="pi-IdInquiry-popup-offer-text">
                   {userName} 님의 아이디는<br/>
                 </span>
 
                   {/*사용자 아이디 + 일부 검열*/}
-                  <span className="IdInquiry-popup-offer-userid">as***23</span>
-                <span className="IdInquiry-popup-offer-text">입니다</span>
+                  <span className="pi-IdInquiry-popup-offer-userid">as***23</span>
+                <span className="pi-IdInquiry-popup-offer-text">입니다</span>
               </span>
                         </div>
 
                         {/*개인정보 보호 설명*/}
-                        <div className="IdInquiry-popup-explain-sub">
+                        <div className="pi-IdInquiry-popup-explain-sub">
                             개인정보 보호를 위해<br/>
                             아이디의 일부만 제공됩니다.
                         </div>
                     </div>
 
                     {/*팝업창 닫기 + 홈페이지로 돌아가기*/}
-                    <div className="IdInquiry-popup-btn" onClick={handleGoHome}>
-                        <div className="IdInquiry-popup-btn-text">홈페이지로 돌아가기</div>
+                    <div className="pi-IdInquiry-popup-btn" onClick={handleGoHome}>
+                        <div className="pi-IdInquiry-popup-btn-text">홈페이지로 돌아가기</div>
                     </div>
                 </div>
             </div>
