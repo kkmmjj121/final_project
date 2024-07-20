@@ -4,17 +4,69 @@ import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
 import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일 import
 import axios from 'axios';
-
 function Management(){
+    // State & Refs
     const [showPopup, setShowPopup] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const imageUrlRef = useRef(null);
-
     const [openSessions, setOpenSessions] = useState({});
-    const handleSessionToggle = (id) => {
+    const [file, setFile] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [error, setError] = useState(null);
+    const [editItem, setEditItem] = useState({});
+    const [items, setItems] = useState([]);
+    const [filteredItems, setFilteredItems] = useState(items);
+    const [searchTermName, setSearchTermName] = useState('');
+    const [searchTermCategory, setSearchTermCategory] = useState('');
+    const [searchTermPlace, setSearchTermPlace] = useState('');
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [showStartDateCalendar, setShowStartDateCalendar] = useState(false);
+    const [showEndDateCalendar, setShowEndDateCalendar] = useState(false);
+    const [filterStartDate, setFilterStartDate] = useState(null);
+    const [filterEndDate, setFilterEndDate] = useState(null);
+    const [filterItemName, setFilterItemName] = useState('');
+    const [showFilterStartDateCalendar, setShowFilterStartDateCalendar] = useState(false);
+    const [showFilterEndDateCalendar, setShowFilterEndDateCalendar] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    const imageUrlRef = useRef(null);
+    const calendarRef = useRef(null);
+    const filterCalendarRef = useRef(null);
+
+// Fetch Image URL
+    const fetchImageUrl = async (filename) => {
+        try {
+            const timestamp = new Date().getTime(); // 현재 타임스탬프 추가
+            const response = await axios.get(`/lost-items/display/${filename}?${timestamp}`, {
+                responseType: 'blob', // 이미지 데이터를 Blob으로 받음
+            });
+            const url = URL.createObjectURL(response.data);
+            return url;
+        } catch (error) {
+            console.error('Error fetching image:', error);
+            return null;
+        }
+    };
+
+// Handle Session Toggle
+    const handleSessionToggle = async (id) => {
         setOpenSessions(prevState => {
             const newState = { ...prevState, [id]: !prevState[id] };
-            // 세션이 열릴 때 스크롤 비활성화
+            if (newState[id]) {
+                const selectedItem = items.find(item => item.lostID === id);
+                setEditItem(selectedItem || {}); // 선택된 아이템의 데이터로 초기화
+
+                // 이미지 URL 설정
+                if (selectedItem && selectedItem.imgFilename) {
+                    fetchImageUrl(selectedItem.imgFilename).then(url => {
+                        setImageUrl(url); // 이미지 URL 설정
+                    });
+                } else {
+                    setImageUrl(null);
+                }
+            }
             if (Object.values(newState).includes(true)) {
                 document.body.classList.add('modal-open');
             } else {
@@ -23,13 +75,30 @@ function Management(){
             return newState;
         });
     };
-    const [file, setFile] = useState(null);
 
+// Handle File Change
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            // 파일 상태 업데이트
+            setFile(selectedFile);
+
+            // 이미지 URL 설정
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageUrl(reader.result); // 파일을 Data URL로 변환하여 상태 업데이트
+            };
+            reader.readAsDataURL(selectedFile);
+        } else {
+            // 파일이 선택되지 않은 경우 상태 초기화
+            setFile(null);
+            setImageUrl(null);
+        }
     };
 
 
+
+// Handle Popup Open
     const handlePopupOpen = async (item) => {
         setSelectedItem(item);
         setEditItem({
@@ -53,6 +122,7 @@ function Management(){
         document.body.classList.add('modal-open');
     };
 
+// Handle Popup Close
     const handlePopupClose = () => {
         // 이전 이미지 URL 해제
         if (imageUrlRef.current) {
@@ -64,15 +134,7 @@ function Management(){
         document.body.classList.remove('modal-open');
     };
 
-    const itemsPerPage = 10;
-    const [currentPage, setCurrentPage] = useState(1);
-    const items = [
-
-        ];
-    const [loading, setLoading] = useState(false);
-
-    const [imageUrl, setImageUrl] = useState(null);
-    const [error, setError] = useState(null);
+// Fetch Items Batch
     const fetchItemsBatch = useCallback(async (ids) => {
         try {
             const requests = ids.map(id => axios.get(`/lost-items/${id}`, {
@@ -88,6 +150,7 @@ function Management(){
         }
     }, []);
 
+// Fetch Items
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
@@ -105,6 +168,7 @@ function Management(){
                     results.push(...batchItems);
                 }
                 setFilteredItems(results);
+                setItems(results); // items 상태 업데이트
             } catch (error) {
                 setError('An error occurred while fetching items.');
                 console.error('Error fetching items:', error);
@@ -116,24 +180,7 @@ function Management(){
         fetchItems();
     }, [fetchItemsBatch]);
 
-
-
-    // 이미지 URL을 가져오는 함수
-    const fetchImageUrl = async (filename) => {
-        try {
-            const timestamp = new Date().getTime(); // 현재 타임스탬프 추가
-            const response = await axios.get(`/lost-items/display/${filename}?${timestamp}`, {
-                responseType: 'blob', // 이미지 데이터를 Blob으로 받음
-            });
-            const url = URL.createObjectURL(response.data);
-            return url;
-        } catch (error) {
-            console.error('Error fetching image:', error);
-            return null;
-        }
-    };
-
-    // selectedItem이 변경될 때마다 이미지 URL을 새로 불러옴
+// SelectedItem 변경 시 이미지 URL 새로 불러옴
     useEffect(() => {
         const loadImage = async () => {
             if (selectedItem && selectedItem.imgFilename) {
@@ -141,35 +188,24 @@ function Management(){
                 setImageUrl(url);
             }
         };
-
         loadImage();
     }, [selectedItem]);
-    const clearCheckedItems = () => {
-        setCheckedItems([]); // 체크된 아이템 초기화
-    };
 
-
+// Handle Page Navigation
     const handlePrevPage = () => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
-        clearCheckedItems();
     };
-
     const handleNextPage = () => {
         const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
         setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages));
-        clearCheckedItems();
     };
     const handleLastPage = () => {
         const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-        clearCheckedItems();
         setCurrentPage(totalPages);
     };
     const handleFirstPage = () => {
         setCurrentPage(1);
-        clearCheckedItems();
     };
-
-
     const getPageNumbers = () => {
         const totalItems = filteredItems.length;
         const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -179,24 +215,202 @@ function Management(){
         for (let i = 1; i <= Math.min(totalPages, maxVisiblePages); i++) {
             pageNumbers.push(i);
         }
-
         return pageNumbers;
     };
     const handlePageClick = (pageNumber) => {
         setCurrentPage(pageNumber);
-        clearCheckedItems();
+    };
+
+// Handle Date Changes
+    const handleStartDateChange = (date) => {
+        setStartDate(date); // 시작 날짜 업데이트
+        setShowStartDateCalendar(false); // 시작 날짜 달력 숨기기
+    };
+    const handleEndDateChange = (date) => {
+        setEndDate(date); // 종료 날짜 업데이트
+        setShowEndDateCalendar(false); // 종료 날짜 달력 숨기기
+    };
+    const handleEndDateCalendarClick = () => {
+        setShowEndDateCalendar(!showEndDateCalendar);
+        setShowStartDateCalendar(false);
+    };
+    const handleStartDateCalendarClick = () => {
+        setShowStartDateCalendar(!showStartDateCalendar);
+        setShowEndDateCalendar(false);
+    };
+
+// Handle Filter Date Changes
+    const handleFilterStartDateChange = (date) => {
+        setFilterStartDate(date); // 필터 시작 날짜 업데이트
+        setShowFilterStartDateCalendar(false); // 필터 시작 날짜 달력 숨기기
+    };
+    const handleFilterEndDateChange = (date) => {
+        setFilterEndDate(date); // 필터 종료 날짜 업데이트
+        setShowFilterEndDateCalendar(false); // 필터 종료 날짜 달력 숨기기
+    };
+    const handleFilterStartDateCalendarClick = () => {
+        setShowFilterStartDateCalendar(!showFilterStartDateCalendar);
+        setShowFilterEndDateCalendar(false);
+    };
+    const handleFilterEndDateCalendarClick = () => {
+        setShowFilterEndDateCalendar(!showFilterEndDateCalendar);
+        setShowFilterStartDateCalendar(false);
+    };
+
+// Handle Search
+    const handleSearch = () => {
+        let filtered = items;
+        // 아이템 이름 필터링
+        if (searchTermName.trim() !== '') {
+            filtered = filtered.filter(item => item.lostName.toLowerCase().includes(searchTermName.toLowerCase()));
+        }
+        // 카테고리 필터링
+        if (searchTermCategory.trim() !== '') {
+            filtered = filtered.filter(item => item.category.toLowerCase().includes(searchTermCategory.toLowerCase()));
+        }
+        // 장소 필터링
+        if (searchTermPlace.trim() !== '') {
+            filtered = filtered.filter(item => item.location.toLowerCase().includes(searchTermPlace.toLowerCase()));
+        }
+        // 날짜 필터링
+        if (startDate && endDate) {
+            filtered = filtered.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+        }
+        // 검색 조건이 모두 비어있으면 원래 목록을 반환
+        if (
+            searchTermName.trim() === '' &&
+            searchTermCategory.trim() === '' &&
+            searchTermPlace.trim() === '' &&
+            (!startDate || !endDate)
+        ) {
+            filtered = items;
+        }
+        // 상태 업데이트
+        setFilteredItems(filtered);
+        setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 설정
+    };
+
+// Handle Edit Change
+    const handleEditChange = (field, value) => {
+        setEditItem(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+// Handle Edit Submit
+    const handleEditSubmit = async (e, itemId) => {
+        e.preventDefault();
+
+        const dateTime = new Date(editItem.date);
+        let formattedDate = dateTime.toISOString().slice(0, 19);
+        const finalDate = formattedDate;
+
+        const formData = new FormData();
+        if (file) {
+            formData.append('file', file); // 선택된 파일을 FormData에 추가
+        }
+        formData.append('lostItem', JSON.stringify({
+            ...editItem,
+            date: finalDate
+        }));
+
+        try {
+            await axios.put(`/lost-items/${itemId}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            // 상태 갱신 및 페이지 새로고침
+            setFilteredItems(prevState =>
+                prevState.map(item =>
+                    item.lostID === itemId ? { ...item, ...editItem } : item
+                )
+            );
+            handleSessionToggle(itemId);
+            window.location.reload();
+
+            // 수정 성공 알림
+            alert('수정되었습니다!');
+
+        } catch (error) {
+            console.error('Error updating item:', error.response ? error.response.data : error.message);
+
+            // 수정 실패 알림
+            alert('이미지를 등록하세요!');
+        }
     };
 
 
 
+// Handle Delete Item
+    const handleDeleteItem = async (itemId) => {
+        // 사용자가 삭제를 확인하는 팝업을 표시
+        const confirmed = window.confirm('삭제 하시겠습니까?');
 
-    const [startDate, setStartDate] = useState(null); // 시작 날짜 상태
-    const [endDate, setEndDate] = useState(null); // 종료 날짜 상태
-    const [showStartDateCalendar, setShowStartDateCalendar] = useState(false); // 시작 날짜 달력 표시 여부 상태
-    const [showEndDateCalendar, setShowEndDateCalendar] = useState(false); // 종료 날짜 달력 표시 여부 상태
+        // 사용자가 확인 버튼을 클릭한 경우
+        if (confirmed) {
+            try {
+                // 삭제 요청을 서버에 보내기
+                await axios.delete(`/lost-items/${itemId}`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
 
-    const calendarRef = useRef(null);
+                // 상태 업데이트: 삭제된 항목을 필터링
+                setFilteredItems(prevState => prevState.filter(item => item.lostID !== itemId));
 
+                // 페이지를 새로고침 (필요에 따라 선택 사항)
+                window.location.reload();
+
+                // 사용자에게 삭제 완료 알림 표시
+                alert('삭제되었습니다!');
+            } catch (error) {
+                // 오류 처리
+                console.error('Error deleting item:', error.response ? error.response.data : error.message);
+            }
+        }
+    };
+
+// Handle New Filter
+    const handleNewFilter = () => {
+        let filteredItems = items; // 전체 아이템 기준으로 필터링
+        // 날짜 필터링
+        if (filterStartDate && filterEndDate) {
+            filteredItems = filteredItems.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= filterStartDate && itemDate <= filterEndDate;
+            });
+        }
+        // 아이템 이름 필터링
+        if (filterItemName.trim() !== '') {
+            filteredItems = filteredItems.filter(item => item.lostName.toLowerCase().includes(filterItemName.toLowerCase()));
+        }
+        // 상태 업데이트
+        setFilteredItems(filteredItems); // 기존 필터링된 결과를 갱신
+        setCurrentPage(1);
+    };
+
+// Handle Reset All
+    const handleResetAll = () => {
+        setStartDate(null);
+        setEndDate(null);
+        setSearchTermName('');
+        setSearchTermPlace('');
+        setSearchTermCategory('');
+    };
+
+// Handle Reset Fast
+    const handleResetFast = () => {
+        setFilterStartDate(null);
+        setFilterEndDate(null);
+        setFilterItemName('');
+    };
+
+// Event Listeners for Click Outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (calendarRef.current && !calendarRef.current.contains(event.target)) {
@@ -211,144 +425,38 @@ function Management(){
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-    const handleStartDateChange = (date) => {
-        setStartDate(date); // 시작 날짜 업데이트
-        setShowStartDateCalendar(false); // 시작 날짜 달력 숨기기
-    };
 
-    const handleEndDateChange = (date) => {
-        setEndDate(date); // 종료 날짜 업데이트
-        setShowEndDateCalendar(false); // 종료 날짜 달력 숨기기
-    };
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (filterCalendarRef.current && !filterCalendarRef.current.contains(event.target)) {
+                setShowFilterStartDateCalendar(false);
+                setShowFilterEndDateCalendar(false);
+            }
+        };
 
-    const handleEndDateCalendarClick = () => {
-        setShowEndDateCalendar(!showEndDateCalendar);
-        setShowStartDateCalendar(false);
-    };
+        document.addEventListener('mousedown', handleClickOutside);
 
-    const handleStartDateCalendarClick = () => {
-        setShowStartDateCalendar(!showStartDateCalendar);
-        setShowEndDateCalendar(false);
-    };
-    const [filteredItems, setFilteredItems] = useState(items);
-    const [searchTerm, setSearchTerm] = useState('');
-    const handleSearch = () => {
-        let filtered = items;
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
-        // 아이템 이름 필터링
-        if (searchTerm.trim() !== '') {
-            filtered = filtered.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-
-        // 날짜 필터링
-        if (startDate && endDate) {
-            filtered = filtered.filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate >= startDate && itemDate <= endDate;
-            });
-        }
-        if (searchTerm.trim() === '' && (!startDate || !endDate)) {
-            filtered = items;
-        }
-
-        // 상태 업데이트
-        setFilteredItems(filtered);
-        setCurrentPage(1); // 검색 시 페이지를 첫 페이지로 설정
-    };
-
-
-    // 현재 페이지에 따라 보여질 아이템을 계산합니다.
+// Display Items
     const displayedItems = filteredItems.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    const handleResetDates = () => {
-        setStartDate(null);
-        setEndDate(null);
-    };
-
-
-    const handleCheckboxChange = (index) => {
-        // 체크된 아이템의 인덱스가 이미 checkedItems 배열에 있으면 제거하고, 없으면 추가합니다.
-        if (checkedItems.includes(index)) {
-            setCheckedItems(checkedItems.filter(itemIndex => itemIndex !== index));
-        } else {
-            setCheckedItems([...checkedItems, index]);
-        }
-    };
-
-    const [checkedItems, setCheckedItems] = useState([]);
-
-    const [editItem, setEditItem] = useState({});
-
-    const handleEditChange = (field, value) => {
-        setEditItem(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const handleEditSubmit = async (e, itemId) => {
-        e.preventDefault();
-
-        const dateTime = new Date(editItem.date);
-        let formattedDate = dateTime.toISOString().slice(0, 19);
-        const finalDate = formattedDate;
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('lostItem', JSON.stringify({
-            ...editItem,
-            date: finalDate
-        }));
-
-        try {
-            await axios.put(`/lost-items/${itemId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-            });
-
-            // 서버에서 업데이트 성공 후, 상태 갱신
-            setFilteredItems(prevState =>
-                prevState.map(item =>
-                    item.lostID === itemId ? { ...item, ...editItem } : item
-                )
-            );
-
-            // 페이지 새로고침
-            window.location.reload();
-
-            handleSessionToggle(itemId); // 세션 닫기
-        } catch (error) {
-            console.error('Error updating item:', error.response ? error.response.data : error.message);
-        }
-    };
-    const handleDeleteItem = async (itemId) => {
-        try {
-            await axios.delete(`/lost-items/${itemId}`, {
-                headers: { 'Content-Type': 'application/json' }
-            });
-            setFilteredItems(prevState => prevState.filter(item => item.lostID !== itemId));
-            window.location.reload();
-        } catch (error) {
-            console.error('Error deleting item:', error.response ? error.response.data : error.message);
-        }
-    };
-
-
 
     if (loading) {
         return <div>Loading...</div>;
     }
 
-    return(
+    return (
         <div className="ad-div">
+            <NavigationBar/>
             <div className="ad-entire">
                 <div className="ad-top">
-                    <div
-                        className="ad-top-container"
-                        >
+                    <div className="ad-top-container">
                         <div className="ad-top-shadow">
                             <div className="ad-top-click-part">
                                 <div className="ad-top-fast-title">빠른검색</div>
@@ -356,27 +464,61 @@ function Management(){
                                 <div className="ad-top-cal-name">
                                     <div className="ad-top-cal">
                                         <div className="ad-top-cal-frame">
-                                            <div className="ad-top-placeholder">습득일</div>
-                                            <div className="ad-top-cal-img">
-                                                <img className="calendar" src="calendar0.svg"/>
+                                            <div className="ad-top-placeholder">
+                                                {filterStartDate ? filterStartDate.toLocaleDateString() : '시작 날짜'}
+                                            </div>
+                                            <div className="ad-top-cal-img"
+                                                 onClick={handleFilterStartDateCalendarClick}>
+                                                <img className="calendar" src="/images/calendar.png"/>
                                             </div>
                                         </div>
+                                        {showFilterStartDateCalendar && (
+                                            <div ref={filterCalendarRef} className="calendar-popup">
+                                                <Calendar
+                                                    onChange={handleFilterStartDateChange}
+                                                    value={filterStartDate}
+                                                    selectRange={false}
+                                                />
+                                            </div>
+                                        )}
                                         <div className="ad-top-ing">~</div>
                                         <div className="ad-top-cal-frame">
-                                            <div className="ad-top-placeholder">습득일</div>
-                                            <div className="ad-top-cal-img">
-                                                <img className="calendar2" src="calendar1.svg"/>
+                                            <div className="ad-top-placeholder">
+                                                {filterEndDate ? filterEndDate.toLocaleDateString() : '종료 날짜'}
+                                            </div>
+                                            <div className="ad-top-cal-img" onClick={handleFilterEndDateCalendarClick}>
+                                                <img className="calendar2" src="/images/calendar.png"/>
                                             </div>
                                         </div>
+                                        {showFilterEndDateCalendar && (
+                                            <div ref={filterCalendarRef} className="calendar-popup">
+                                                <Calendar
+                                                    onChange={handleFilterEndDateChange}
+                                                    value={filterEndDate}
+                                                    selectRange={false}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="ad-top-name-ref">
                                         <div className="ad-top-name-frame">
-                                            <div className="ad-top-name-placeholder">습득물</div>
-                                            <div className="ad-top-search-img">
-                                                <div className="search">search</div>
-                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="검색"
+                                                onChange={(e) => setFilterItemName(e.target.value)}
+                                                className="ad-top-name-placeholder"
+                                            />
+                                            <img
+                                                className="ad-top-search-img"
+                                                src="/images/search.png"
+                                                onClick={handleNewFilter}
+                                            />
                                         </div>
-                                        <img className="ad-top-refresh" src="ad-top-refresh0.svg"/>
+                                        <img
+                                            className="ad-top-refresh"
+                                            src="/images/refresh_white.png"
+                                            onClick={handleResetFast}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -387,7 +529,7 @@ function Management(){
                 <div className="ad-main-search-container">
                     <div className="ad-main-search-title">
                         <div className="ad-div2">습득물 상세 검색</div>
-                        <img className="chevron-down" src="chevron-down0.svg"/>
+                        <img className="chevron-down" src="/images/refresh.png" onClick={handleResetAll}/>
                     </div>
                     <div className="ad-main-search-frame">
                         <div className="ad-main-cate">
@@ -395,9 +537,11 @@ function Management(){
                                 type="text"
                                 className="ad-main-cate-placeholder"
                                 placeholder="분류"
+                                value={searchTermCategory}
+                                onChange={(e) => setSearchTermCategory(e.target.value)}
                             />
                             <div className="ad-main-cate-btn">
-                            <img className="pencil-01" src="pencil-010.svg"/>
+                                <img className="pencil-01" src="/images/pencil.png"/>
                             </div>
                         </div>
                         <div className="ad-main-name">
@@ -405,9 +549,11 @@ function Management(){
                                 type="text"
                                 className="ad-main-name-placeholder"
                                 placeholder="분실물 이름"
+                                value={searchTermName}
+                                onChange={(e) => setSearchTermName(e.target.value)}
                             />
                             <div className="ad-main-name-btn">
-                                <img className="pencil-012" src="pencil-011.svg"/>
+                                <img className="pencil-012" src="/images/pencil.png"/>
                             </div>
                         </div>
                         <div className="ad-main-cal-container">
@@ -418,44 +564,55 @@ function Management(){
                                 <div className="calendar-frame" onClick={handleStartDateCalendarClick}>
                                     <img className="calendar2" src="/images/calendar.png" alt="calendar"/>
                                 </div>
+                                {showStartDateCalendar && (
+                                    <div className="calendar-popup" ref={calendarRef}>
+                                        <Calendar onChange={handleStartDateChange} value={startDate}/>
+                                    </div>
+                                )}
                             </div>
                             <div className="ad-main-ing">~</div>
                             <div className="ad-main-cal-frame">
-                                <div className="ad-main-cal-placeholder">습득일</div>
-                                <div className="ad-main-cal-img">
-                                    <img className="calendar4" src="calendar3.svg"/>
+                                <div className="ad-main-cal-placeholder">
+                                    {endDate ? endDate.toLocaleDateString() : '종료 날짜'}
                                 </div>
+                                <div className="calendar-frame" onClick={handleEndDateCalendarClick}>
+                                    <img className="calendar2" src="/images/calendar.png" alt="calendar"/>
+                                </div>
+                                {showEndDateCalendar && (
+                                    <div className="calendar-popup" ref={calendarRef}>
+                                        <Calendar onChange={handleEndDateChange} value={endDate}/>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="ad-main-place-person">
                             <div className="ad-main-place-person-frame">
                                 <div className="ad-main-place">
-                                    <div className="ad-main-place-placeholder">습득장소</div>
+                                    <input
+                                        type="text"
+                                        className="ad-main-cate-placeholder"
+                                        placeholder="습득 장소"
+                                        value={searchTermPlace}
+                                        onChange={(e) => setSearchTermPlace(e.target.value)}
+                                    />
                                     <div className="ad-main-place-btn">
-                                        <img className="pencil-013" src="pencil-012.svg"/>
-                                    </div>
-                                </div>
-                                <div className="ad-main-person">
-                                    <div className="ad-main-person-placeholder">분실자 이름</div>
-                                    <div className="ad-main-person-btn">
-                                        <img className="pencil-014" src="pencil-013.svg"/>
+                                        <img className="pencil-013" src="/images/pencil.png"/>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="ad-main-search-container2">
-                        <div className="ad-main-search-btn">
+                        <div className="ad-main-search-btn" onClick={handleSearch}>
                             <div className="ad-main-search-txt">검색하기</div>
                             <div className="ad-main-search-img">
-                                <div className="ad-main-search-icon">search</div>
+                                <img className="ad-main-search-icon" src="/images/search.png"/>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="ad-main-item-cate">
                     <div className="ad-main-cate2">
-
                         <div className="ad-main-cate-index-box">
                             <div className="ad-main-cate-index">등록번호</div>
                             <div className="ad-main-cate-dot"></div>
@@ -468,7 +625,6 @@ function Management(){
                             <div className="ad-main-cate-name">습득물 이름</div>
                             <div className="ad-main-cate-dot"></div>
                         </div>
-
                         <div className="ad-main-cate-place-box">
                             <div className="ad-main-cate-place">습득장소</div>
                             <div className="ad-main-cate-dot"></div>
@@ -477,7 +633,6 @@ function Management(){
                             <div className="ad-main-cate-date">습득일</div>
                             <div className="ad-main-cate-dot"></div>
                         </div>
-
                         <div className="ad-main-cate-admin-box">
                             <div className="ad-main-cate-admin">게시글 관리</div>
                         </div>
@@ -486,49 +641,38 @@ function Management(){
                         <div className="lost-main-frame-items">
                             {displayedItems.map((item, index) => (
                                 <div key={index} className="frame-item">
-
-
-
-                                    <div
-                                        className="ad-main-cate-index-box"
-                                        onClick={() => handlePopupOpen(item)}
-                                    >
+                                    <div className="ad-main-cate-index-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="div2">{item.lostID}</div>
                                     </div>
                                     <div className="ad-main-cate-cate-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="frame-950">
-
-                                        <div className="div3">{item.category}</div>
+                                            <div className="div3">{item.category}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-name-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="div2">{item.lostName}</div>
                                     </div>
-
                                     <div className="ad-main-cate-place-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="frame-950">
-                                            <img className="marker-pin-01" src="/images/marker-pin-01.png"
-                                                 alt="marker pin"/>
+                                            <img
+                                                className="marker-pin-01"
+                                                src="/images/marker-pin-01.png"
+                                                alt="marker pin"
+                                            />
                                             <div className="div3">{item.location}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-date-box" onClick={() => handlePopupOpen(item)}>
-                                    <div className="frame-950">
+                                        <div className="frame-950">
                                             <div className="div3">{item.date}</div>
                                         </div>
                                     </div>
-
                                     <div className="ad-main-cate-admin-box">
-
-                                        <div
-                                            className="frame-983"
-
-                                        >
+                                        <div className="frame-983">
                                             <div className="frame-981" onClick={() => handleSessionToggle(item.lostID)}>
                                                 <div className="smbtn">수정</div>
                                             </div>
                                         </div>
-                                        {/* 세션 내용 */}
                                         {openSessions[item.lostID] && (
                                             <div className="session-overlay">
                                                 <div className="session-content">
@@ -565,8 +709,6 @@ function Management(){
                                                                 onChange={(e) => handleEditChange('date', e.target.value)}
                                                             />
                                                         </label>
-
-
                                                         <label>
                                                             설명:
                                                             <textarea
@@ -581,24 +723,24 @@ function Management(){
                                                                 accept="image/*"
                                                                 onChange={handleFileChange}
                                                             />
+                                                            {imageUrl && <img src={imageUrl} alt="현재 이미지"
+                                                                              className="session-image"/>}
                                                         </label>
+
                                                         <button type="submit">저장</button>
                                                     </form>
                                                     <button onClick={() => handleDeleteItem(item.lostID)}>삭제</button>
-
                                                     <button className="session-close-button"
-                                                            onClick={() => handleSessionToggle(item.lostID)}>닫기
+                                                            onClick={() => handleSessionToggle(item.lostID)}>
+                                                        x
                                                     </button>
                                                 </div>
                                             </div>
                                         )}
-
                                     </div>
-
                                 </div>
                             ))}
                         </div>
-
                     </div>
                     <div className="ad-regi-line">
                         <div className="ad-regi-container">
@@ -610,16 +752,26 @@ function Management(){
                 </div>
                 <div className="lost-page">
                     <div className="lost-left-arrow">
-                        <img className="chevron-left-double" src="/images/chevron-left-double.png" alt="previous double"
-                             onClick={handleFirstPage}/>
-                        <img className="chevron-left" src="/images/chevron-left.png" alt="previous"
-                             onClick={handlePrevPage}/>
+                        <img
+                            className="chevron-left-double"
+                            src="/images/chevron-left-double.png"
+                            alt="previous double"
+                            onClick={handleFirstPage}
+                        />
+                        <img
+                            className="chevron-left"
+                            src="/images/chevron-left.png"
+                            alt="previous"
+                            onClick={handlePrevPage}
+                        />
                     </div>
                     {getPageNumbers().map((pageNumber, index) => (
                         typeof pageNumber === 'number' ? (
-                            <button key={index}
-                                    className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
-                                    onClick={() => handlePageClick(pageNumber)}>
+                            <button
+                                key={index}
+                                className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
+                                onClick={() => handlePageClick(pageNumber)}
+                            >
                                 {pageNumber}
                             </button>
                         ) : (
@@ -627,10 +779,18 @@ function Management(){
                         )
                     ))}
                     <div className="lost-right-arrow">
-                    <img className="chevron-right" src="/images/chevron-right.png" alt="next"
-                             onClick={handleNextPage}/>
-                        <img className="chevron-right-double" src="/images/chevron-right-double.png" alt="next double"
-                             onClick={handleLastPage}/>
+                        <img
+                            className="chevron-right"
+                            src="/images/chevron-right.png"
+                            alt="next"
+                            onClick={handleNextPage}
+                        />
+                        <img
+                            className="chevron-right-double"
+                            src="/images/chevron-right-double.png"
+                            alt="next double"
+                            onClick={handleLastPage}
+                        />
                     </div>
                 </div>
             </div>
@@ -648,8 +808,8 @@ function Management(){
                         <p><strong>날짜:</strong> {selectedItem.date}</p>
                         <p><strong>세부사항</strong></p>
                         <pre>
-                            {selectedItem.description}
-                        </pre>
+                    {selectedItem.description}
+                </pre>
                         <p><strong>이미지:</strong></p>
                         <p>Image Name: {selectedItem.imgFilename}</p>
                         {imageUrl ? (
@@ -661,7 +821,6 @@ function Management(){
                 </div>
             )}
         </div>
-
 
     );
 }

@@ -5,13 +5,14 @@
 .lost {
     background: #ffffff;
     width: 100%;
-    height: 1443px;
+
     position: relative;
     overflow-x: auto; /* x축 스크롤 자동 생성 */
     overflow-y: hidden; /* y축 스크롤 숨김 */
     display: flex; /* Flexbox 사용 */
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
+    height: 1443px;
 }
 
 .lost-content {
