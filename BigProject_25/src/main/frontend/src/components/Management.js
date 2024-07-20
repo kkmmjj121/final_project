@@ -93,7 +93,7 @@ function Management(){
             setLoading(true);
             setError(null);
 
-            const maxId = 100;
+            const maxId = 20;
             const batchSize = 20; // 한 번에 요청할 ID 수
             const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 
@@ -622,11 +622,11 @@ function Management(){
                         </div>
                     </div>
                     <div className="ad-regi-line">
-                        <div className="ad-regi-container">
+                        <a href='/Register' className="ad-regi-container">
                             <div className="ad-regi-btn">
                                 <div className="ad-regi-txt">분실물 등록</div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
                 <div className="lost-page">

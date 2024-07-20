@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import '../styles/Lost.css';
 import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
@@ -7,11 +7,56 @@ import axios from 'axios';
 function Lost() {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
-    const items=[];
+    const [selectedItem, setSelectedItem] = useState(null);
+    const imageUrlRef = useRef(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [showPopup, setShowPopup] = useState(false);
+    const handlePopupOpen = async (item) => {
+        setSelectedItem(item);
+
+        if (item && item.imgFilename) {
+            // 이전 이미지 URL 해제
+            if (imageUrlRef.current) {
+                URL.revokeObjectURL(imageUrlRef.current);
+            }
+            // 새로운 이미지 URL 생성
+            const url = await fetchImageUrl(item.imgFilename);
+            setImageUrl(url);
+            imageUrlRef.current = url;
+        }
+        setShowPopup(true);
+        document.body.classList.add('modal-open');
+    };
+    const handlePopupClose = () => {
+        // 이전 이미지 URL 해제
+        if (imageUrlRef.current) {
+            URL.revokeObjectURL(imageUrlRef.current);
+            imageUrlRef.current = null;
+        }
+        setImageUrl(null); // 상태 초기화
+        setShowPopup(false); // 팝업 닫기
+        document.body.classList.remove('modal-open');
+    };
+    const fetchImageUrl = async (filename) => {
+        try {
+            const timestamp = new Date().getTime(); // 현재 타임스탬프 추가
+            const response = await axios.get(`/lost-items/display/${filename}?${timestamp}`, {
+                responseType: 'blob', // 이미지 데이터를 Blob으로 받음
+            });
+            const url = URL.createObjectURL(response.data);
+            return url;
+        } catch (error) {
+            console.error('Error fetching image:', error);
+            return null;
+        }
+    };
+
 
     const [id, setId] = useState(1); // 초기값으로 1을 설정
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [items, setItems] = useState([]);
+    const [filteredItems, setFilteredItems] = useState([]);
 
 
 
@@ -31,40 +76,50 @@ function Lost() {
     const handleFirstPage = () => {
         setCurrentPage(1);
     };
+    const fetchItemsBatch = useCallback(async (ids) => {
+        try {
+            const requests = ids.map(id => axios.get(`/lost-items/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }));
+            const responses = await Promise.all(requests);
+            return responses.map(response => response.data).filter(data => data && data.lostID);
+        } catch (err) {
+            console.error('Error fetching items batch:', err);
+            throw err;
+        }
+    }, []);
+
     useEffect(() => {
         const fetchItems = async () => {
             setLoading(true);
             setError(null);
 
-            const fetchItem = async (id) => {
-                try {
-                    const response = await axios.get(`/lost-items/${id}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    });
-                    return response.data;
-                } catch (err) {
-                    console.log(`Error fetching ID ${id}: ${err.message}`);
-                    return null;
-                }
-            };
+            const maxId = 20;
+            const batchSize = 20;
+            const ids = Array.from({ length: maxId }, (_, i) => i + 1);
 
-            const maxId = 20; // 실제 최대 ID로 교체
-            const fetchedItems = [];
-            for (let id = 1; id <= maxId; id++) {
-                const item = await fetchItem(id);
-                if (item) {
-                    fetchedItems.push(item);
+            try {
+                const results = [];
+                for (let i = 0; i < ids.length; i += batchSize) {
+                    const batchIds = ids.slice(i, i + batchSize);
+                    const batchItems = await fetchItemsBatch(batchIds);
+                    results.push(...batchItems);
                 }
+                setItems(results); // 전체 아이템 상태 업데이트
+                setFilteredItems(results); // 초기화된 상태로 설정
+            } catch (error) {
+                setError('An error occurred while fetching items.');
+                console.error('Error fetching items:', error);
+            } finally {
+                setLoading(false);
             }
-
-            setFilteredItems(fetchedItems);
-            setLoading(false);
         };
 
         fetchItems();
-    }, []);
+    }, [fetchItemsBatch]);
+
 
 
 
@@ -126,10 +181,10 @@ function Lost() {
         setShowStartDateCalendar(!showStartDateCalendar);
         setShowEndDateCalendar(false);
     };
-    const [filteredItems, setFilteredItems] = useState(items);
+    // const [filteredItems, setFilteredItems] = useState(items);
     const [searchTerm, setSearchTerm] = useState('');
     const handleSearch = () => {
-        let filtered = [...filteredItems]; // 현재 필터링된 아이템을 복사
+        let filtered = [...items]; // 전체 아이템을 기준으로 필터링
 
         // 아이템 이름 필터링
         if (searchTerm.trim() !== '') {
@@ -159,7 +214,11 @@ function Lost() {
     const handleResetDates = () => {
         setStartDate(null);
         setEndDate(null);
+        setSearchTerm('');
     };
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
 
 
@@ -298,9 +357,35 @@ function Lost() {
                     <div className="lost-main-frame-items">
                         {displayedItems.map((item, index) => (
                             <div key={index} className="frame-item">
-                                <div className="frame-945">
+                                {showPopup && selectedItem && (
+                                    <div className="popup-overlay">
+                                        <div className="popup-content">
+                                            <button className="popup-close" onClick={handlePopupClose}>
+                                                X
+                                            </button>
+                                            <h2>상세 정보</h2>
+                                            <p><strong>등록번호:</strong> {selectedItem.lostID}</p>
+                                            <p><strong>분류:</strong> {selectedItem.category}</p>
+                                            <p><strong>이름:</strong> {selectedItem.lostName}</p>
+                                            <p><strong>장소:</strong> {selectedItem.location}</p>
+                                            <p><strong>날짜:</strong> {selectedItem.date}</p>
+                                            <p><strong>세부사항</strong></p>
+                                            <pre>
+                            {selectedItem.description}
+                        </pre>
+                                            <p><strong>이미지:</strong></p>
+                                            <p>Image Name: {selectedItem.imgFilename}</p>
+                                            {imageUrl ? (
+                                                <img src={imageUrl} alt={selectedItem.imgFilename} className="popup-image"/>
+                                            ) : (
+                                                <p>이미지를 불러오는 중입니다...</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                <button className="frame-945" onClick={() => handlePopupOpen(item)}>
                                     <div className="div">{item.category}</div>
-                                </div>
+                                </button>
                                 <div className="frame-9452">
                                     <div className="div2">{item.lostName}</div>
                                 </div>
