@@ -12,7 +12,8 @@ import Items from "./components/Items";
 import Management from "./components/Management";
 import Register from "./components/Register"
 import ProtectedRoute from './utils/ProtectedRoute';
-
+import IdInquiry from "./components/IdInquiry"
+import PwInquiry from "./components/PwInquiry"
 function App() {
     const [agreed, setAgreed] = useState(false);
     return (
@@ -37,9 +38,12 @@ function App() {
                 }/>
                 <Route path="/Management" element={<Management/>}/>
                 <Route path="/Register" element={<Register/>}/>
+                <Route path="/IdInquiry" element={<IdInquiry/>}/>
+               <Route path="/PwInquiry" element={<PwInquiry/>}/>
             </Routes>
         </Router>
     );
+
 }
 
 export default App;

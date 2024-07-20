@@ -7,6 +7,7 @@ import com.example.BigProject_25.repository.VerificationTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,14 +69,14 @@ public class AuthService {
     @Value("${google.redirect-uri}")
     private String googleRedirectUri;
 
-    @Value("${naver.client-id}")
-    private String naverClientId;
-
-    @Value("${naver.client-secret}")
-    private String naverClientSecret;
-
-    @Value("${naver.redirect-uri}")
-    private String naverRedirectUri;
+//    @Value("${naver.client-id}")
+//    private String naverClientId;
+//
+//    @Value("${naver.client-secret}")
+//    private String naverClientSecret;
+//
+//    @Value("${naver.redirect-uri}")
+//    private String naverRedirectUri;
 
     public void saveUser(User user) {
         userRepository.save(user);
@@ -90,35 +91,49 @@ public class AuthService {
                 return kakaoLogin(token);
             case "google":
                 return googleLogin(token);
-            case "naver":
-                return naverLogin(token);
+//            case "naver":
+//                return naverLogin(token);
             default:
                 return false;
         }
     }
-
-    private boolean kakaoLogin(String token) {
+    public boolean kakaoLogin(String token) {
         try {
             String url = "https://kapi.kakao.com/v2/user/me";
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+            if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                // 로그 출력 및 오류 처리
+                System.out.println("Unauthorized - Invalid token or insufficient permissions");
+                return false;
+            }
+
             String result = response.getBody();
+            System.out.println("Response from Kakao API: " + result);
 
             JSONObject jsonObj = new JSONObject(result);
+
+            if (!jsonObj.has("kakao_account")) {
+                throw new JSONException("kakao_account not found in the response");
+            }
+
             JSONObject kakaoAccount = jsonObj.getJSONObject("kakao_account");
 
+
             User user = new User();
-            user.setName(kakaoAccount.getJSONObject("profile").getString("nickname"));
-            user.setEmail(kakaoAccount.getString("email"));
-            // 필요한 추가 정보 설정
-
-            // 사용자 정보 저장 또는 업데이트 로직 추가
-
+            if (kakaoAccount.has("profile") && kakaoAccount.getJSONObject("profile").has("nickname")) {
+                user.setName(kakaoAccount.getJSONObject("profile").getString("nickname"));
+            } else {
+                throw new JSONException("nickname not found in the response");
+            }
+            user.setEmailVerified(true);
             userRepository.save(user);
 
             return true;
@@ -154,7 +169,6 @@ public class AuthService {
             return null;
         }
     }
-
     private boolean googleLogin(String token) {
         try {
             String url = "https://www.googleapis.com/oauth2/v3/userinfo";
@@ -162,6 +176,7 @@ public class AuthService {
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
@@ -169,14 +184,22 @@ public class AuthService {
 
             JSONObject jsonObj = new JSONObject(result);
 
-            User user = new User();
-            user.setName(jsonObj.getString("name"));
-            user.setEmail(jsonObj.getString("email"));
-            // 필요한 추가 정보 설정
-
-            // 사용자 정보 저장 또는 업데이트 로직 추가
-
-            userRepository.save(user);
+            // 사용자 이메일로 이미 등록된 사용자가 있는지 확인
+            User existingUser = userRepository.findByEmail(jsonObj.getString("email"));
+            User user;
+            if (existingUser == null) {
+                user = new User();
+                user.setName(jsonObj.getString("name"));
+                user.setEmail(jsonObj.getString("email"));
+                user.setEmailVerified(true);
+                userRepository.save(user);
+            } else {
+                user = existingUser;
+                if (!user.isEmailVerified()) {
+                    user.setEmailVerified(true);
+                    userRepository.save(user);
+                }
+            }
 
             return true;
         } catch (Exception e) {
@@ -212,66 +235,75 @@ public class AuthService {
             return null;
         }
     }
-
-    private boolean naverLogin(String token) {
-        try {
-            String url = "https://openapi.naver.com/v1/nid/me";
-            RestTemplate restTemplate = new RestTemplate();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            String result = response.getBody();
-
-            JSONObject jsonObj = new JSONObject(result);
-            JSONObject responseObj = jsonObj.getJSONObject("response");
-
-            User user = new User();
-            user.setName(responseObj.getString("name"));
-            user.setEmail(responseObj.getString("email"));
-            // 필요한 추가 정보 설정
-
-            // 사용자 정보 저장 또는 업데이트 로직 추가
-
-            userRepository.save(user);
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public String getNaverAccessToken(String code) {
-        try {
-            String url = "https://nid.naver.com/oauth2.0/token";
-            RestTemplate restTemplate = new RestTemplate();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-            body.add("grant_type", "authorization_code");
-            body.add("client_id", naverClientId);
-            body.add("client_secret", naverClientSecret);
-            body.add("redirect_uri", naverRedirectUri);
-            body.add("code", code);
-            body.add("state", "random_state");
-
-            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-            String result = response.getBody();
-
-            JSONObject jsonObj = new JSONObject(result);
-            return jsonObj.getString("access_token");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//
+//    private boolean naverLogin(String token) {
+//        try {
+//            String url = "https://openapi.naver.com/v1/nid/me";
+//            RestTemplate restTemplate = new RestTemplate();
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.set("Authorization", "Bearer " + token);
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            HttpEntity<String> entity = new HttpEntity<>(headers);
+//
+//            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+//            String result = response.getBody();
+//
+//            JSONObject jsonObj = new JSONObject(result);
+//            JSONObject responseObj = jsonObj.getJSONObject("response");
+//
+//            // 사용자 이메일로 이미 등록된 사용자가 있는지 확인
+//            User existingUser = userRepository.findByEmail(responseObj.getString("email"));
+//            User user;
+//            if (existingUser == null) {
+//                user = new User();
+//                user.setName(responseObj.getString("name"));
+//                user.setEmail(responseObj.getString("email"));
+//                user.setPhoneNum(responseObj.getString("phoneNum"));
+//                user.setEmailVerified(true);
+//                userRepository.save(user);
+//            } else {
+//                user = existingUser;
+//                if (!user.isEmailVerified()) {
+//                    user.setEmailVerified(true);
+//                    userRepository.save(user);
+//                }
+//            }
+//
+//            return true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
+//    public String getNaverAccessToken(String code) {
+//        try {
+//            String url = "https://nid.naver.com/oauth2.0/token";
+//            RestTemplate restTemplate = new RestTemplate();
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//            body.add("grant_type", "authorization_code");
+//            body.add("client_id", naverClientId);
+//            body.add("client_secret", naverClientSecret);
+//            body.add("redirect_uri", naverRedirectUri);
+//            body.add("code", code);
+//            body.add("state", "random_state");
+//
+//            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+//
+//            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+//            String result = response.getBody();
+//
+//            JSONObject jsonObj = new JSONObject(result);
+//            return jsonObj.getString("access_token");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     public boolean login(String userID, String password, String captchaResponse) {
         boolean isCaptchaValid = true;  // 캡챠 검증을 임시로 통과시키기 위해 true로 설정
@@ -303,6 +335,14 @@ public class AuthService {
         }
 
         return false;
+    }
+
+    public String getUserIdByEmailAndName(String email, String name) {
+        User user = userRepository.findByEmail(email);
+        if (user != null && user.getName().equals(name)) {
+            return user.getUserID();
+        }
+        return null;
     }
 
     @Transactional
@@ -347,6 +387,45 @@ public class AuthService {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();
+    }
+
+
+    // 비밀번호 재설정 요청 함수
+    public boolean requestPasswordReset(String userID, String name) {
+        User user = userRepository.findByUserID(userID);
+        if (user != null && user.getName().equals(name)) {
+            String tempPassword = generateTemporaryPassword();
+            user.setPassword(passwordEncoder.encode(tempPassword));
+            userRepository.save(user);
+            emailService.sendTemporaryPasswordEmail(user.getEmail(), tempPassword);
+            return true;
+        }
+        return false;
+    }
+
+    // 임시 비밀번호 생성 함수
+    private String generateTemporaryPassword() {
+        // 임시 비밀번호 생성 로직 (10자리 영문, 숫자 조합)
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder tempPassword = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            int randomIndex = (int) (Math.random() * chars.length());
+            tempPassword.append(chars.charAt(randomIndex));
+        }
+        return tempPassword.toString();
+    }
+
+    // 비밀번호 변경 함수
+    public boolean changePassword(String userID, String oldPassword, String newPassword) {
+        User user = userRepository.findByUserID(userID);
+        if (user != null && passwordEncoder.matches(oldPassword, user.getPassword())) {
+            if (isValidPassword(newPassword)) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+                return true;
+            }
+        }
+        return false;
     }
 
     public String generateVerificationToken(User user) {
