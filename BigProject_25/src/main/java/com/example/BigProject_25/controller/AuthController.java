@@ -84,6 +84,8 @@ public class AuthController {
         return authService.logout();
     }
 
+
+
     @GetMapping("/confirm")
     public ResponseEntity<String> confirmUser(@RequestParam("token") String token) {
         boolean isConfirmed = authService.verifyEmail(token);
