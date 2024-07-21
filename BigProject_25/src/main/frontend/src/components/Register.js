@@ -109,12 +109,14 @@ function Register() {
 
             <div className="lost-register-upload">
                 <div className="lost-register-upload-lost-image">
+                    {imageSrc ? <img src={imageSrc} alt="Preview" id="image-preview" /> : <p id="file-name"></p>}
                     <div className="lost-register-upload-lost-image-frame">
                         <div className="lost-register-upload-lost-image-frame-text">
-                            사진 업로드
+
+
+                            <input type="file" id="file-upload" onChange={handleFileChange} placeholder="파일위치열기"/>
                         </div>
                     </div>
-                    <input type="file" id="file-upload" onChange={handleFileChange} placeholder="파일위치열기"/>
                 </div>
 
                 <div className="lost-register-upload-info-auto">
