@@ -91,48 +91,80 @@ function Register() {
     };
 
     return (
-        <div className="container">
-            <form onSubmit={handleSubmit}>
-                <div className="form-section">
-                    <label>분류</label>
-                    <div>
-                        <button type="button" onClick={() => handleCategorySelect('아이폰')}>아이폰</button>
-                        <button type="button" onClick={() => handleCategorySelect('가방')}>가방</button>
-                        <button type="button" onClick={() => handleCategorySelect('지갑')}>지갑</button>
+
+        <div className="register">
+            <div className="lost-register-banner">
+                <div className="lost-register-banner-title">분실물 등록</div>
+                <div className="lost-register-banner-crumbs">
+                    <div className="banner-crumbs-lost-register">
+                        <div className="banner-crumbs-lost-register-text">분실물 간편등록</div>
                     </div>
+                    <div className="banner-crumbs-lost">
+                        <div className="banner-crumbs-lost-text">분실물 서비스 관리</div>
+                    </div>
+                    <div className="banner-crumbs-icon">
+                    </div>
+                </div>
+            </div>
 
-                    <label htmlFor="itemCategory">분류</label>
-                    <input type="text" id="itemCategory" value={formData.itemCategory} onChange={handleInputChange} />
-                    <label htmlFor="itemName">습득물 이름</label>
-                    <input type="text" id="itemName" value={formData.itemName} onChange={handleInputChange} />
-                    <label htmlFor="itemFeature">습득물 특징</label>
-                    <input type="text" id="itemFeature" value={formData.itemFeature} onChange={handleInputChange} />
-                    <label htmlFor="finderName">본인자 이름</label>
-                    <input type="text" id="finderName" value={formData.finderName} onChange={handleInputChange} />
-                    <label htmlFor="foundLocation">습득 장소</label>
-                    <input type="text" id="foundLocation" value={formData.foundLocation} onChange={handleInputChange} />
-                    <label htmlFor="postContent">게시글 내용 (상세한 설명)</label>
-                    <textarea id="postContent" rows="4" value={formData.postContent} onChange={handleInputChange}></textarea>
+            <div className="lost-register-upload">
+                <div className="lost-register-upload-lost-image">
+                    <div className="lost-register-upload-lost-image-frame">
+                        {imageSrc ? <img src={imageSrc} alt="Preview" id="image-preview" /> : <p id="file-name">AI가 습득물의 종류를 자동으로 입력 해 드립니다.</p>}
+                        <div className="lost-register-upload-lost-image-frame-text">
+                            사진 업로드
+                        </div>
+                    </div>
+                    <div className="lost-register-upload-lost-image-info-text">
+                        분실물 종류를
+                        <br/>
+                        AI가 분석해드립니다
+                    </div>
+                            <input className="lost-register-upload-lost-image-btn" type="file" id="file-upload" onChange={handleFileChange} placeholder="분류"/>
+
+
                 </div>
 
-                <div className="upload-section">
-                    <label htmlFor="file-upload" id="file-label">파일업로드</label>
-                    <input type="file" id="file-upload" onChange={handleFileChange} />
-                    {imageSrc ? <img src={imageSrc} alt="Preview" id="image-preview" /> : <p id="file-name">AI가 습득물의 종류를 자동으로 입력 해 드립니다.</p>}
+                <div className="lost-register-upload-info-auto">
+                    <div className="item-category">
+                        <div className="item-category-text">분류
+                            <input type="text" id="itemCategory" value={formData.itemCategory}
+                                   onChange={handleInputChange}/></div>
+                    </div>
+                    <div className="frame-1101">
+                        <div className="div">등록날짜<input
+                            type="text"
+                            id="currentDateTime"
+                            value={currentDateTime}
+                            readOnly
+                        /></div>
+                    </div>
                 </div>
 
-                <div className="datetime-section">
-                    <label htmlFor="currentDateTime">현재 날짜 및 시간</label>
-                    <input
-                        type="text"
-                        id="currentDateTime"
-                        value={currentDateTime}
-                        readOnly
-                    />
+                <div className="lost-register-upload-info-input">
+                    <div className="item-name">
+                        <div className="item-name-text">습득물 이름
+                            <input type="text" id="itemName" value={formData.itemName} onChange={handleInputChange}/>
+                        </div>
+                    </div>
+                    <div className="found-location">
+                        <div className="found-location-text">습득 장소
+                            <input type="text" id="foundLocation" value={formData.foundLocation}
+                                   onChange={handleInputChange}/></div>
+                    </div>
+                    <div className="post-content">
+                        <div className="post-content-text">게시글 내용 (상세한 설명)
+                            <textarea id="postContent" rows="4" value={formData.postContent}
+                                      onChange={handleInputChange}></textarea>
+                        </div>
+                    </div>
                 </div>
 
-                <button className="submit-btn" type="submit">게시글 등록</button>
-            </form>
+                <div className="lost-register-upload-btn">
+                    <button className="submit-btn" type="submit" onClick={handleSubmit}>분실물 등록하기</button>
+                    {/*<div className="lost-register-upload-btn-text">분실물 등록하기</div>*/}
+                </div>
+            </div>
         </div>
     );
 }

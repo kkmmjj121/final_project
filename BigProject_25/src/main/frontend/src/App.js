@@ -14,6 +14,8 @@ import Register from "./components/Register"
 import ProtectedRoute from './utils/ProtectedRoute';
 import IdInquiry from "./components/IdInquiry"
 import PwInquiry from "./components/PwInquiry"
+import Mypage from "./components/Mypage"
+
 function App() {
     const [agreed, setAgreed] = useState(false);
     return (
@@ -39,7 +41,13 @@ function App() {
                 <Route path="/Lost" element={<Lost />}/>
                 <Route path="/Register" element={<Register/>}/>
                 <Route path="/IdInquiry" element={<IdInquiry/>}/>
-               <Route path="/PwInquiry" element={<PwInquiry/>}/>
+                <Route path="/PwInquiry" element={<PwInquiry/>}/>
+                <Route path="/Mypage" element={
+                    <ProtectedRoute>
+                        <Mypage/>
+                    </ProtectedRoute>
+
+                }/>
             </Routes>
         </Router>
     );

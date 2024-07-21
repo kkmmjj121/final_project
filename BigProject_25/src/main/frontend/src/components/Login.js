@@ -366,8 +366,8 @@ const Login = () => {
                 </form>
 
                 <div className="login-links">
-                    <Link to="/find-id-email" className="find-link">아이디를 잊어버리셨나요?</Link>
-                    <Link to="/find-password" className="find-link">비밀번호를 잊어버리셨나요?</Link>
+                    <Link to="/IdInquiry" className="find-link">아이디를 잊어버리셨나요?</Link>
+                    <Link to="/PwInquiry" className="find-link">비밀번호를 잊어버리셨나요?</Link>
                 </div>
 
                 <div className="login-social">

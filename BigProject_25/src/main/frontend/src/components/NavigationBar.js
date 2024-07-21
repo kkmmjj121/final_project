@@ -30,15 +30,16 @@ function NavigationBar() {
                 <img src="/images/main_logo.png" alt="logo"/>
             </a>
             <div className="home-right-side">
-
                 <Link to='/Management' className="home-right-side-text">분실물등록</Link>
                 <Link to='/Taxi' className="home-right-side-text">택시승강장관리</Link>
                 {isLoggedIn ? (
-                    <Link to ='/' onClick={handleLogout} className="home-right-side-text">로그아웃</Link>
+                    <>
+                        <Link to='/Mypage' className="home-right-side-text">마이페이지</Link>
+                        <Link to='/' onClick={handleLogout} className="home-right-side-text">로그아웃</Link>
+                    </>
                 ) : (
                     <Link to='/Login' className="home-right-side-text">로그인</Link>
                 )}
-
             </div>
         </div>
     );
