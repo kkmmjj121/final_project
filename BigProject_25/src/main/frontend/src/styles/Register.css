@@ -23,30 +23,6 @@
     overflow: hidden;
 }
 
-.lost-register-upload-btn {
-    background: #3f51b5;
-    border-radius: 45px;
-    padding: 8px 16px 8px 16px;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    width: 250px;
-    position: absolute;
-    left: calc(50% - 80px);
-    bottom: 20px;
-    overflow: hidden;
-}
-
-.submit-btn {
-    color: #ffffff;
-    text-align: left;
-    font-family: "NotoSans-Bold", sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    position: relative;
-}
 
 .lost-register-upload-info-input {
     border-radius: 7px;
@@ -76,7 +52,7 @@
     overflow: hidden;
 }
 
-.item-name-text {
+.item-name-input {
     color: #adadad;
     text-align: left;
     font-family: "NotoSans-Medium", sans-serif;
@@ -86,6 +62,13 @@
     left: 52px;
     top: calc(50% - 11.5px);
     width: 274px;
+    border: none; /* 테두리 제거 */
+    background: none; /* 배경 제거 */
+    outline: none; /* 포커스 시 생기는 외곽선 제거 */
+}
+
+.item-name-input::placeholder {
+    color: #adadad; /* 플레이스홀더 텍스트 색상 */
 }
 
 .item-name-icon {
@@ -108,7 +91,7 @@
     overflow: hidden;
 }
 
-.found-location-text {
+.found-location-input {
     color: #adadad;
     text-align: left;
     font-family: "NotoSans-Medium", sans-serif;
@@ -118,6 +101,12 @@
     right: 14px;
     top: calc(50% - 11.5px);
     width: 274px;
+    border: none; /* 테두리 제거 */
+    background: none; /* 배경 제거 */
+    outline: none; /* 포커스 시 생기는 외곽선 제거 */
+}
+.found-location-input::placeholder {
+    color: #adadad; /* 플레이스홀더 텍스트 색상 */
 }
 
 .found-location-icon {
@@ -137,7 +126,7 @@
     overflow: hidden;
 }
 
-.post-content-text {
+.post-content-textarea {
     color: #adadad;
     text-align: left;
     font-family: "NotoSans-Medium", sans-serif;
@@ -148,6 +137,14 @@
     top: 14px;
     width: 274px;
     height: 164px;
+    border: none; /* 테두리 제거 */
+    background: none; /* 배경 제거 */
+    outline: none; /* 포커스 시 생기는 외곽선 제거 */
+    resize: none; /* 크기 조절 제거 */
+}
+
+.post-content-textarea::placeholder {
+    color: #adadad; /* 플레이스홀더 텍스트 색상 */
 }
 
 .post-content-icon {
@@ -187,7 +184,7 @@
     overflow: hidden;
 }
 
-.item-category-text {
+.item-category-input {
     color: #5d5d5d;
     text-align: left;
     font-family: "NotoSans-Medium", sans-serif;
@@ -197,6 +194,9 @@
     left: 52px;
     top: 13px;
     width: 274px;
+    border: none; /* 테두리 제거 */
+    background: none; /* 배경 제거 */
+    outline: none; /* 포커스 시 생기는 외곽선 제거 */
 }
 
 .item-category-icon {
@@ -208,7 +208,7 @@
     overflow: visible;
 }
 
-.frame-1101 {
+.register-date {
     align-self: stretch;
     flex-shrink: 0;
     height: 51px;
@@ -216,17 +216,25 @@
     overflow: hidden;
 }
 
-.div {
+.register-date-input {
     color: #5d5d5d;
     text-align: left;
     font-family: "NotoSans-Medium", sans-serif;
     font-size: 16px;
     font-weight: 500;
     position: absolute;
-    right: 14px;
+    left: 52px;
     top: calc(50% - 11.5px);
     width: 274px;
+    border: none; /* 테두리 제거 */
+    background: none; /* 배경 제거 */
+    outline: none; /* 포커스 시 생기는 외곽선 제거 */
+    resize: none; /* 크기 조절 제거 */
 }
+.register-date-input::placeholder {
+    color: #adadad; /* 플레이스홀더 텍스트 색상 */
+}
+
 
 .calendar-check-01 {
     width: 24px;
@@ -327,6 +335,8 @@
     left: calc(50% - 960px);
     top: 0px;
     overflow: hidden;
+
+    background-color: black;
 }
 
 .lost-register-banner-title {
@@ -430,4 +440,34 @@
     height: 24px;
     position: relative;
     overflow: visible;
+}
+
+.submit-btn {
+    background: #3f51b5;
+    border-radius: 45px;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    width: 250px;
+    position: absolute;
+    left: calc(50% - 125px); /* 50% - (버튼 너비의 절반) */
+    bottom: 20px;
+    overflow: hidden;
+
+    color: #ffffff;
+    text-align: center;
+    font-family: "NotoSans-Bold", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    border: none; /* 테두리 제거 */
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+}
+
+.submit-btn:hover {
+    color: #1a237e;
+    background: #ffffff; /* 호버 시 배경색 변경 */
+    border: #1a237e;
 }

@@ -15,6 +15,7 @@ import ProtectedRoute from './utils/ProtectedRoute';
 import IdInquiry from "./components/IdInquiry"
 import PwInquiry from "./components/PwInquiry"
 import Mypage from "./components/Mypage"
+import Chat from "./components/Chat"
 
 function App() {
     const [agreed, setAgreed] = useState(false);
@@ -48,6 +49,7 @@ function App() {
                     </ProtectedRoute>
 
                 }/>
+                <Route path="/Chat" element={<Chat/>}/>
             </Routes>
         </Router>
     );

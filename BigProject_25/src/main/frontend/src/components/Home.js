@@ -90,7 +90,7 @@ function Home() {
 
     return (
         <div className="home-div">
-            <NavigationBar />
+            <NavigationBar/>
             <div className="home-content">
 
                 {isNextScreen ? (
@@ -176,7 +176,7 @@ function Home() {
                 )}
                 <div className="home-sub-content-1">
                     <div className="home-sub-content-1-description">
-                        <img className="home-sub-content-1-rect" src="/images/main_star.png" />
+                        <img className="home-sub-content-1-rect" src="/images/main_star.png"/>
                         <div className="home-sub-content-1-text">승객분들께서 많이 찾으시는 서비스</div>
                     </div>
                     <div className="home-sub-content-1-main">
@@ -186,7 +186,7 @@ function Home() {
                                     <div className="home-sub-content-1-container-text-1">서비스소개</div>
                                     <div className="home-sub-content-1-container-right">
                                         <img className="home-sub-content-1-container-image"
-                                             src="/images/main_sub_plane.png" />
+                                             src="/images/main_sub_plane.png"/>
                                         <div className="home-arrow-box">
                                             <img
                                                 className="home-arrow-narrow-right"
@@ -201,7 +201,7 @@ function Home() {
                                     <div className="home-sub-content-1-container-text-1">수속과정안내</div>
                                     <div className="home-sub-content-1-container-right">
                                         <img className="home-sub-content-1-container-image"
-                                             src="/images/main_sub_ticket.png" />
+                                             src="/images/main_sub_ticket.png"/>
                                         <div className="home-arrow-box">
                                             <img
                                                 className="home-arrow-narrow-right"
@@ -218,7 +218,7 @@ function Home() {
                                     <div className="home-sub-content-1-container-text-1">반입물품안내</div>
                                     <div className="home-sub-content-1-container-right">
                                         <img className="home-sub-content-1-container-image"
-                                             src="/images/main_sub_bag.png" />
+                                             src="/images/main_sub_bag.png"/>
                                         <div className="home-arrow-box">
                                             <img
                                                 className="home-arrow-narrow-right"
@@ -233,7 +233,7 @@ function Home() {
                                     <div className="home-sub-content-1-container-text-1">FAQ</div>
                                     <div className="home-sub-content-1-container-right">
                                         <img className="home-sub-content-1-container-image"
-                                             src="/images/main_sub_info.png" />
+                                             src="/images/main_sub_info.png"/>
                                         <div className="home-arrow-box">
                                             <img
                                                 className="home-arrow-narrow-right"
@@ -246,9 +246,142 @@ function Home() {
                         </div>
                     </div>
                 </div>
+                <div className="home-sub-content-2">
+                    <div className="home-sub-content-2-main">
+                        <img className="home-sub-content-2-rect" src="/images/main_cursor.png"/>
+                        <div className="home-sub-content-2-text">대구공항 소식</div>
+                    </div>
+                    <div className="home-sub-content-2-container">
+                        <div className="home-sub-content-2-container-description">
+                            <div className="home-sub-content-2-container-description-top">
+                                <div className="home-sub-content-2-container-description-top-container">
+                                    <div className="home-article">
+                                        <div className="home-article-top">
+                                            <div className="home-article-top-left">
+                                                <div className="home-bell-box">
+                                                    <img className="home-bell" src="/images/bell.png"/>
+                                                </div>
+                                                <div className="home-broad-text-box">
+                                                    <div className="home-broad-text">보도자료</div>
+                                                </div>
+                                                <div className="home-sub-container-2-date">2024.07.15</div>
+                                            </div>
+                                            <img className="home-dots-vertical" src="/images/dots-vertical.png"/>
+                                        </div>
+                                        <div className="home-article-title">
+                                            [단독] 동북아 허브 꿈꾼다…대구공항,
+                                            <br/>
+                                            환승시설 구축 추진
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <img
+                                className="home-sub-content-2-container-description-image"
+                                src="/images/article_image(temp).png"
+                            />
+                        </div>
+                        <div className="home-sub-content-2-container-description">
+                            <div className="home-sub-content-2-container-description-top">
+                                <div className="home-sub-content-2-container-description-top-container">
+                                    <div className="home-article">
+                                        <div className="home-article-top">
+                                            <div className="home-article-top-left">
+                                                <div className="home-bell-box">
+                                                    <img className="home-bell" src="/images/bell.png"/>
+                                                </div>
+                                                <div className="home-broad-text-box">
+                                                    <div className="home-broad-text">보도자료</div>
+                                                </div>
+                                                <div className="home-sub-container-2-date">2024.07.15</div>
+                                            </div>
+                                            <img className="home-dots-vertical" src="/images/dots-vertical.png"/>
+                                        </div>
+                                        <div className="home-article-title">
+                                            [단독] 동북아 허브 꿈꾼다…대구공항,
+                                            <br/>
+                                            환승시설 구축 추진
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <img
+                                className="home-sub-content-2-container-description-image"
+                                src="/images/article_image(temp).png"
+                            />
+                        </div>
+                        <div className="home-sub-content-2-container-description">
+                            <div className="home-sub-content-2-container-description-top">
+                                <div className="home-sub-content-2-container-description-top-container">
+                                    <div className="home-article">
+                                        <div className="home-article-top">
+                                            <div className="home-article-top-left">
+                                                <div className="home-bell-box">
+                                                    <img className="home-bell" src="/images/bell.png"/>
+                                                </div>
+                                                <div className="home-broad-text-box">
+                                                    <div className="home-broad-text">보도자료</div>
+                                                </div>
+                                                <div className="home-sub-container-2-date">2024.07.15</div>
+                                            </div>
+                                            <img className="home-dots-vertical" src="/images/dots-vertical.png"/>
+                                        </div>
+                                        <div className="home-article-title">
+                                            [단독] 동북아 허브 꿈꾼다…대구공항,
+                                            <br/>
+                                            환승시설 구축 추진
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <img
+                                className="home-sub-content-2-container-description-image"
+                                src="/images/article_image(temp).png"
+                            />
+                        </div>
+                    </div>
+                    <div className="home-sub-content-2-bottom">
+                        <div className="home-sub-content-2-box">
+                            <div className="home-sub-content-2-description">
+                                <div className="home-sub-content-2-text2">전체뉴스</div>
+                                <Link to='/' className="home-sub-content-2-link">
+                                    <div className="home-sub-content-2-link-text">바로가기</div>
+                                    <img className="home-arrow-narrow-right5"
+                                         src="/images/arrow-narrow-right(black).png"/>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="home-sub-content-2-box">
+                            <div className="home-sub-content-2-description">
+                                <div className="home-sub-content-2-text2">보도자료</div>
+                                <Link to='/' className="home-sub-content-2-link">
+                                    <div className="home-sub-content-2-link-text">바로가기</div>
+                                    <img className="home-arrow-narrow-right5"
+                                         src="/images/arrow-narrow-right(black).png"/>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="home-sub-content-2-box">
+                            <div className="home-sub-content-2-description">
+                                <div className="home-sub-content-2-text2">참고자료</div>
+                                <Link to='/' className="home-sub-content-2-link">
+                                    <div className="home-sub-content-2-link-text">바로가기</div>
+                                    <img className="home-arrow-narrow-right5"
+                                         src="/images/arrow-narrow-right(black).png"/>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="home-footer">
+                <div className="home-footer-content"></div>
             </div>
         </div>
-    );
+
+
+)
+    ;
 }
 
 export default Home;

@@ -110,60 +110,70 @@ function Register() {
             <div className="lost-register-upload">
                 <div className="lost-register-upload-lost-image">
                     <div className="lost-register-upload-lost-image-frame">
-                        {imageSrc ? <img src={imageSrc} alt="Preview" id="image-preview" /> : <p id="file-name">AI가 습득물의 종류를 자동으로 입력 해 드립니다.</p>}
                         <div className="lost-register-upload-lost-image-frame-text">
                             사진 업로드
                         </div>
                     </div>
-                    <div className="lost-register-upload-lost-image-info-text">
-                        분실물 종류를
-                        <br/>
-                        AI가 분석해드립니다
-                    </div>
-                            <input className="lost-register-upload-lost-image-btn" type="file" id="file-upload" onChange={handleFileChange} placeholder="분류"/>
-
-
+                    <input type="file" id="file-upload" onChange={handleFileChange} placeholder="파일위치열기"/>
                 </div>
 
                 <div className="lost-register-upload-info-auto">
                     <div className="item-category">
-                        <div className="item-category-text">분류
-                            <input type="text" id="itemCategory" value={formData.itemCategory}
-                                   onChange={handleInputChange}/></div>
+                        <input
+                            type="text"
+                            id="itemCategory"
+                            value={formData.itemCategory}
+                            onChange={handleInputChange}
+                            placeholder="분류"
+                            className="item-category-input"
+                        />
                     </div>
-                    <div className="frame-1101">
-                        <div className="div">등록날짜<input
+                    <div className="register-date">
+                        <input
+                            className="register-date-input"
+                            placeholder="등록날짜"
                             type="text"
                             id="currentDateTime"
                             value={currentDateTime}
                             readOnly
-                        /></div>
+                        />
                     </div>
                 </div>
 
                 <div className="lost-register-upload-info-input">
                     <div className="item-name">
-                        <div className="item-name-text">습득물 이름
-                            <input type="text" id="itemName" value={formData.itemName} onChange={handleInputChange}/>
-                        </div>
+                        <input
+                            type="text"
+                            id="itemName"
+                            value={formData.itemName}
+                            onChange={handleInputChange}
+                            placeholder="습득물 이름"
+                            className="item-name-input"
+                        />
                     </div>
                     <div className="found-location">
-                        <div className="found-location-text">습득 장소
-                            <input type="text" id="foundLocation" value={formData.foundLocation}
-                                   onChange={handleInputChange}/></div>
+                        <input
+                            type="text"
+                            id="foundLocation"
+                            value={formData.foundLocation}
+                            onChange={handleInputChange}
+                            placeholder="습득 장소"
+                            className="found-location-input"
+                        />
                     </div>
                     <div className="post-content">
-                        <div className="post-content-text">게시글 내용 (상세한 설명)
-                            <textarea id="postContent" rows="4" value={formData.postContent}
-                                      onChange={handleInputChange}></textarea>
-                        </div>
+              <textarea
+                  id="postContent"
+                  rows="4"
+                  value={formData.postContent}
+                  onChange={handleInputChange}
+                  placeholder="게시글 내용 (상세한 설명)"
+                  className="post-content-textarea"
+              />
                     </div>
                 </div>
 
-                <div className="lost-register-upload-btn">
-                    <button className="submit-btn" type="submit" onClick={handleSubmit}>분실물 등록하기</button>
-                    {/*<div className="lost-register-upload-btn-text">분실물 등록하기</div>*/}
-                </div>
+                <button className="submit-btn" type="submit" onClick={handleSubmit}>분실물 등록하기</button>
             </div>
         </div>
     );
