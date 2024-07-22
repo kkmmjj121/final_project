@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import {FaEye, FaEyeSlash} from 'react-icons/fa';
-import axios from 'axios'; // axiosConfig.js에서 가져오기
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import axios from 'axios';
 import '../styles/Signup.css';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-const Signup = ({agreed}) => {
+const Signup = ({ agreed }) => {
     const [userID, setUsername] = useState('');
     const [userIDError, setUsernameError] = useState('');
     const [email, setEmail] = useState('');
@@ -21,6 +21,7 @@ const Signup = ({agreed}) => {
     const [phoneError, setPhoneError] = useState('');
     const [notRobot, setNotRobot] = useState(false);
     const [captchaValue, setCaptchaValue] = useState(null);
+    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -89,7 +90,6 @@ const Signup = ({agreed}) => {
         setName(e.target.value);
     };
 
-
     const handlePhoneChange = (e) => {
         setPhone(e.target.value);
         setPhoneError('');
@@ -99,7 +99,6 @@ const Signup = ({agreed}) => {
         setNotRobot(e.target.value);
     };
 
-
     const handlePhoneBlur = () => {
         const phoneRegex = /^01[016789]\d{3,4}\d{4}$/;
         if (phone && !phoneRegex.test(phone)) {
@@ -107,8 +106,8 @@ const Signup = ({agreed}) => {
         } else {
             setPhoneError('');
         }
-
     };
+
     const onCaptchaChange = (value) => {
         setCaptchaValue(value);
     };
@@ -137,17 +136,23 @@ const Signup = ({agreed}) => {
             captchaResponse: captchaValue
         };
 
-        axios.post('/auth/signup', user, {
+        try {
+            const response = await axios.post('/auth/signup', user);
+            console.log('Success:', response.data);
+            setShowModal(true); // 회원가입 성공 시 모달 표시
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
-        })
-            .then(response => {
-                console.log('Success:', response.data);
-                navigate('/login'); // 회원가입 후 로그인 페이지로 이동
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    const handleCloseModal = () => {
+        setShowModal(false);
+    };
 
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            handleCloseModal();
+        }
     };
 
     return (
@@ -184,7 +189,6 @@ const Signup = ({agreed}) => {
                                 onChange={handleEmailChange}
                                 onBlur={handleEmailBlur}
                             />
-                            <button type="button" className="availability-button">이메일 인증</button>
                         </div>
                         <div className="error-message-container">
                             {emailError && <p className="error-message">{emailError}</p>}
@@ -257,7 +261,6 @@ const Signup = ({agreed}) => {
                                 onChange={handlePhoneChange}
                                 onBlur={handlePhoneBlur}
                             />
-                            <button type="button" className="availability-button">전화번호 인증</button>
                         </div>
                         <div className="error-message-container">
                             {phoneError && <p className="error-message">{phoneError}</p>}
@@ -280,6 +283,16 @@ const Signup = ({agreed}) => {
                     </button>
                 </form>
             </div>
+
+            {showModal && (
+                <div className="modal-backdrop" onClick={handleBackdropClick}>
+                    <div className="modal">
+                        <h2>이메일 인증</h2>
+                        <p>회원가입이 완료되었습니다. 이메일을 확인해 주세요.</p>
+                        <button className="modal-button" onClick={handleCloseModal}>닫기</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

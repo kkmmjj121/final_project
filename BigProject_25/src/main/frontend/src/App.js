@@ -16,6 +16,7 @@ import IdInquiry from "./components/IdInquiry"
 import PwInquiry from "./components/PwInquiry"
 import Mypage from "./components/Mypage"
 import Chat from "./components/Chat"
+import Confirm from './components/Confirm';
 
 function App() {
     const [agreed, setAgreed] = useState(false);
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/" element={<Home/>}/>
                 <Route path="/Login" element={<Login/>}/>
                 <Route path="/signup" element={<Signup agreed={agreed}/>}/>
+                <Route path="/auth/confirm" element={<Confirm />} />
                 <Route path="/PrivacyAgreement" element={<PrivacyAgreement setAgreed={setAgreed}/>}/>
                 <Route path="/ServiceIntro" element={<ServiceIntro/>}/>
                 <Route path="/procedure" element={<Procedure/>}/>
