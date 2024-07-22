@@ -74,7 +74,7 @@ public class AuthController {
         if (authService.socialLogin(provider, token)) {
             return ResponseEntity.ok("소셜 로그인 성공");
         } else {
-            return ResponseEntity.status(401).body("소셜 로그인 실패");
+            return ResponseEntity.status(401).body("소셜 로그인 실    패");
         }
     }
 
