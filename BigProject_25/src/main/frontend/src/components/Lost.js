@@ -4,6 +4,9 @@ import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
 import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일
 import axios from 'axios';
+import { ChevronCompactLeft, ChevronCompactRight, ChevronDoubleLeft, ChevronDoubleRight } from 'react-bootstrap-icons';
+
+
 function Lost() {
     const itemsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -294,22 +297,22 @@ function Lost() {
 
                                 </div>
                                 <div className="lost-cate-rfs">
-                                <div className="lost-cate">
-                                    <input
-                                        type="text"
-                                        className="lost-cate-placeholder"
-                                        placeholder="습득물"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                    <button className="search-frame" onClick={handleSearch}>
-                                        <img className="search" src="/images/search.png" alt="Search"/>
-                                    </button>
+                                    <div className="lost-cate">
+                                        <input
+                                            type="text"
+                                            className="lost-cate-placeholder"
+                                            placeholder="습득물"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                        <button className="search-frame" onClick={handleSearch}>
+                                            <img className="search" src="/images/search.png" alt="Search"/>
+                                        </button>
 
-                                </div>
-                                <button className="calendar-refresh" onClick={handleResetDates}>
-                                    <img src="/images/refresh_white.png"/>
-                                </button>
+                                    </div>
+                                    <button className="calendar-refresh" onClick={handleResetDates}>
+                                        <img src="/images/refresh_white.png"/>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -329,7 +332,7 @@ function Lost() {
                         </span>
                     </span>
                         </div>
-                        <a href='https://www.lost112.go.kr/' className="lost-to-police-btn"  target="_blank">
+                        <a href='https://www.lost112.go.kr/' className="lost-to-police-btn" target="_blank">
                             <div className="lost-to-police-btn-text">
                                 경찰청 유실물 통합포털 바로가기
                             </div>
@@ -381,20 +384,20 @@ function Lost() {
                                         </div>
                                     </div>
                                 )}
-                                <div className="frame-945" onClick={() => handlePopupOpen(item)}>
-                                    <div className="div">{item.category}</div>
+                                <div className="lost-item-box" onClick={() => handlePopupOpen(item)}>
+                                    <div className="lost-item-box-div">{item.category}</div>
                                 </div>
-                                <div className="frame-9452" onClick={() => handlePopupOpen(item)}>
-                                    <div className="div2">{item.lostName}</div>
+                                <div className="lost-item-get" onClick={() => handlePopupOpen(item)}>
+                                    <div className="lost-item-get-div">{item.lostName}</div>
                                 </div>
-                                <div className="frame-947" onClick={() => handlePopupOpen(item)}>
-                                    <div className="frame-950">
+                                <div className="lost-item-place-box" onClick={() => handlePopupOpen(item)}>
+                                    <div className="lost-item-place">
                                         <img className="marker-pin-01" src="/images/marker-pin-01.png"
                                              alt="marker pin"/>
-                                        <div className="div3">{item.location}</div>
+                                        <div className="lost-item-place-div">{item.location}</div>
                                     </div>
                                 </div>
-                                <div className="frame-946" onClick={() => handlePopupOpen(item)}>
+                                <div className="lost-item-date-box" onClick={() => handlePopupOpen(item)}>
                                     <div className="lost-item-date">{item.date.slice(0, 10)}</div>
                                 </div>
 
@@ -404,17 +407,14 @@ function Lost() {
                 </div>
                 <div className="lost-page">
                     <div className="lost-left-arrow">
-                        <img className="chevron-left-double" src="/images/chevron-left-double.png" alt="previous double"
-                             onClick={handleFirstPage}/>
-                        <img className="chevron-left" src="/images/chevron-left.png" alt="previous"
-                             onClick={handlePrevPage}/>
+                        <ChevronDoubleLeft className="lost-left-double" onClick={handleFirstPage}/>
+                        <ChevronCompactLeft className="lost-left" onClick={handlePrevPage}/>
                     </div>
                     {getPageNumbers().map((pageNumber, index) => (
                         typeof pageNumber === 'number' ? (
-                            <button
-                                key={index}
-                                className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
-                                onClick={() => handlePageClick(pageNumber)}>
+                            <button key={index}
+                                    className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
+                                    onClick={() => handlePageClick(pageNumber)}>
                                 {pageNumber}
                             </button>
                         ) : (
@@ -422,10 +422,8 @@ function Lost() {
                         )
                     ))}
                     <div className="lost-right-arrow">
-                        <img className="chevron-right" src="/images/chevron-right.png" alt="next"
-                             onClick={handleNextPage}/>
-                        <img className="chevron-right-double" src="/images/chevron-right-double.png" alt="next double"
-                             onClick={handleLastPage}/>
+                        <ChevronCompactRight className="lost-right" onClick={handleNextPage}/>
+                        <ChevronDoubleRight className="lost-right-double" onClick={handleLastPage}/>
                     </div>
                 </div>
             </div>

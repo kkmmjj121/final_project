@@ -4,6 +4,7 @@ import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
 import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일 import
 import axios from 'axios';
+import {ChevronCompactLeft, ChevronCompactRight, ChevronDoubleLeft, ChevronDoubleRight} from "react-bootstrap-icons";
 function Management(){
     // State & Refs
     const [showPopup, setShowPopup] = useState(false);
@@ -642,24 +643,22 @@ function Management(){
                             {displayedItems.map((item, index) => (
                                 <div key={index} className="frame-item">
                                     <div className="ad-main-cate-index-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="div2">{item.lostID}</div>
+                                        <div className="index-box-text">{item.lostID}</div>
                                     </div>
                                     <div className="ad-main-cate-cate-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="frame-950">
-                                            <div className="div3">{item.category}</div>
-                                        </div>
+                                            <div className="cate-box-text">{item.category}</div>
                                     </div>
                                     <div className="ad-main-cate-name-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="div2">{item.lostName}</div>
+                                        <div className="name-box-text">{item.lostName}</div>
                                     </div>
                                     <div className="ad-main-cate-place-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="frame-950">
+                                        <div className="get-place-box">
                                             <img
                                                 className="marker-pin-01"
                                                 src="/images/marker-pin-01.png"
                                                 alt="marker pin"
                                             />
-                                            <div className="div3">{item.location}</div>
+                                            <div className="place-box-text">{item.location}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-date-box" onClick={() => handlePopupOpen(item)}>
@@ -750,47 +749,25 @@ function Management(){
                         </div>
                     </div>
                 </div>
-                <div className="lost-page">
-                    <div className="lost-left-arrow">
-                        <img
-                            className="chevron-left-double"
-                            src="/images/chevron-left-double.png"
-                            alt="previous double"
-                            onClick={handleFirstPage}
-                        />
-                        <img
-                            className="chevron-left"
-                            src="/images/chevron-left.png"
-                            alt="previous"
-                            onClick={handlePrevPage}
-                        />
+                <div className="management-page">
+                    <div className="management-left-arrow">
+                        <ChevronDoubleLeft className="management-left-double" onClick={handleFirstPage}/>
+                        <ChevronCompactLeft className="management-left" onClick={handlePrevPage}/>
                     </div>
                     {getPageNumbers().map((pageNumber, index) => (
                         typeof pageNumber === 'number' ? (
-                            <button
-                                key={index}
-                                className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
-                                onClick={() => handlePageClick(pageNumber)}
-                            >
+                            <button key={index}
+                                    className={`page-button ${currentPage === pageNumber ? 'active-page' : ''}`}
+                                    onClick={() => handlePageClick(pageNumber)}>
                                 {pageNumber}
                             </button>
                         ) : (
                             <span key={index} className="ellipsis">...</span>
                         )
                     ))}
-                    <div className="lost-right-arrow">
-                        <img
-                            className="chevron-right"
-                            src="/images/chevron-right.png"
-                            alt="next"
-                            onClick={handleNextPage}
-                        />
-                        <img
-                            className="chevron-right-double"
-                            src="/images/chevron-right-double.png"
-                            alt="next double"
-                            onClick={handleLastPage}
-                        />
+                    <div className="management-right-arrow">
+                        <ChevronCompactRight className="management-right" onClick={handleNextPage}/>
+                        <ChevronDoubleRight className="management-right-double" onClick={handleLastPage}/>
                     </div>
                 </div>
             </div>

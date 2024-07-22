@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Mypage.css';
+import NavigationBar from "./NavigationBar";
 
 // 모달 컴포넌트 정의
 const Modal = ({ isOpen, onClose, children }) => {
@@ -93,60 +94,83 @@ function Mypage() {
     }
 
     return (
-        <div>
-            <h1>마이페이지</h1>
-            {email && name ? (
-                <>
-                    <p>이메일: {email}</p>
-                    <p>이름: {name}</p>
-                </>
-            ) : (
-                <p>정보를 가져오지 못했습니다.</p>
-            )}
+        <div className="mypage">
+            <NavigationBar/>
+            <div className="mypage-main-banner">
+                <h1 className="mypage-main-banner-text">MYPAGE</h1>
+            </div>
 
-            <button onClick={handleOpenModal}>
-                비밀번호 변경
-            </button>
+            <div className="mypage-content">
+                <div className="mypage-content-text">회원정보</div>
+                {email && name ? (
+                    <>
+                        <div className="mypage-username-text">회원이름</div>
+                        <p className="mypage-username-input">{name}</p>
+                        <div className="mypage-useremail-text">이메일</div>
+                        <p className="mypage-useremail-input">{email}</p>
+                    </>
+                ) : (
+                    <p>정보를 가져오지 못했습니다.</p>
+                )}
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                <h2>비밀번호 변경</h2>
-                <form onSubmit={handlePasswordChange}>
-                    <div>
-                        <label htmlFor="userID">아이디:</label>
-                        <input
-                            type="text"
-                            id="userID"
-                            value={userID}
-                            onChange={(e) => setUserID(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="oldPassword">기존 비밀번호:</label>
-                        <input
-                            type="password"
-                            id="oldPassword"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="newPassword">새 비밀번호:</label>
-                        <input
-                            type="password"
-                            id="newPassword"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit">비밀번호 변경</button>
-                </form>
+                <div className="mypage-pw-btn" onClick={handleOpenModal}>
+                    <div className="mypage-pw-btn-text">비밀번호 변경</div>
+                </div>
+            </div>
 
-                {passwordSuccess && <p>{passwordSuccess}</p>}
-                {passwordError && <p>{passwordError}</p>}
+            <Modal isOpen={isModalOpen}>
+                <div className="mypage-pw">
+                    <form onSubmit={handlePasswordChange}>
+                        <div className="mypage-pw-popup">
+                            <div className="popup-close-box" onClick={handleCloseModal}>x</div>
+                            <div className="logo">
+                                <div className="a-irport">AIrport</div>
+                            </div>
+
+                            <div className="mypage-pw-popup-text">비밀번호 변경</div>
+
+                            <div>
+                                {/*아이디*/}
+                                <input
+                                    className="mypage-pw-popup-name"
+                                    type="text"
+                                    id="userID"
+                                    value={userID}
+                                    onChange={(e) => setUserID(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                {/*이전*/}
+                                <input
+                                    className="mypage-pw-popup-current"
+                                    type="password"
+                                    id="oldPassword"
+                                    value={oldPassword}
+                                    onChange={(e) => setOldPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                {/*신규*/}
+                                <input
+                                    className="mypage-pw-popup-change"
+                                    type="password"
+                                    id="newPassword"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <button className="mypage-pw-popup-btn" type="submit">비밀번호 변경</button>
+                        </div>
+                    </form>
+
+                    {passwordSuccess && <p>{passwordSuccess}</p>}
+                    {passwordError && <p>{passwordError}</p>}
+                </div>
             </Modal>
+
         </div>
     );
 }
