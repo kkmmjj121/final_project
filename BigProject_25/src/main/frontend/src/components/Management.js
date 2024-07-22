@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import '../styles/Management.css';
 import NavigationBar from "./NavigationBar";
 import Calendar from 'react-calendar'; // react-calendar 라이브러리 import
 import 'react-calendar/dist/Calendar.css'; // react-calendar 스타일 import
 import axios from 'axios';
 import {ChevronCompactLeft, ChevronCompactRight, ChevronDoubleLeft, ChevronDoubleRight} from "react-bootstrap-icons";
-function Management(){
+
+function Management() {
     // State & Refs
     const [showPopup, setShowPopup] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -54,7 +55,7 @@ function Management(){
 // Handle Session Toggle
     const handleSessionToggle = async (id) => {
         setOpenSessions(prevState => {
-            const newState = { ...prevState, [id]: !prevState[id] };
+            const newState = {...prevState, [id]: !prevState[id]};
             if (newState[id]) {
                 const selectedItem = items.find(item => item.lostID === id);
                 setEditItem(selectedItem || {}); // 선택된 아이템의 데이터로 초기화
@@ -96,7 +97,6 @@ function Management(){
             setImageUrl(null);
         }
     };
-
 
 
 // Handle Popup Open
@@ -159,7 +159,7 @@ function Management(){
 
             const maxId = 50;
             const batchSize = 5; // 한 번에 요청할 ID 수
-            const ids = Array.from({ length: maxId }, (_, i) => i + 1);
+            const ids = Array.from({length: maxId}, (_, i) => i + 1);
 
             try {
                 const results = [];
@@ -329,7 +329,7 @@ function Management(){
             // 상태 갱신 및 페이지 새로고침
             setFilteredItems(prevState =>
                 prevState.map(item =>
-                    item.lostID === itemId ? { ...item, ...editItem } : item
+                    item.lostID === itemId ? {...item, ...editItem} : item
                 )
             );
             handleSessionToggle(itemId);
@@ -347,7 +347,6 @@ function Management(){
     };
 
 
-
 // Handle Delete Item
     const handleDeleteItem = async (itemId) => {
         // 사용자가 삭제를 확인하는 팝업을 표시
@@ -358,7 +357,7 @@ function Management(){
             try {
                 // 삭제 요청을 서버에 보내기
                 await axios.delete(`/lost-items/${itemId}`, {
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {'Content-Type': 'application/json'}
                 });
 
                 // 상태 업데이트: 삭제된 항목을 필터링
@@ -643,10 +642,10 @@ function Management(){
                             {displayedItems.map((item, index) => (
                                 <div key={index} className="frame-item">
                                     <div className="ad-main-cate-index-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="index-box-text">{item.lostID}</div>
+                                        <div className="ad-main-cate-index">{item.lostID}</div>
                                     </div>
                                     <div className="ad-main-cate-cate-box" onClick={() => handlePopupOpen(item)}>
-                                            <div className="cate-box-text">{item.category}</div>
+                                        <div className="cate-box-text">{item.category}</div>
                                     </div>
                                     <div className="ad-main-cate-name-box" onClick={() => handlePopupOpen(item)}>
                                         <div className="name-box-text">{item.lostName}</div>
@@ -662,8 +661,8 @@ function Management(){
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-date-box" onClick={() => handlePopupOpen(item)}>
-                                        <div className="frame-950">
-                                            <div className="div3">{item.date}</div>
+                                        <div className="cate-date-box">
+                                            <div className="date-text">{item.date}</div>
                                         </div>
                                     </div>
                                     <div className="ad-main-cate-admin-box">
@@ -772,8 +771,8 @@ function Management(){
                 </div>
             </div>
             {showPopup && selectedItem && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
+                <div className="popup-overlay" onClick={handlePopupClose}>
+                    <div className="popup-content" onClick={(e) => e.stopPropagation()}>
                         <button className="popup-close" onClick={handlePopupClose}>
                             X
                         </button>
@@ -783,10 +782,10 @@ function Management(){
                         <p><strong>이름:</strong> {selectedItem.lostName}</p>
                         <p><strong>장소:</strong> {selectedItem.location}</p>
                         <p><strong>날짜:</strong> {selectedItem.date}</p>
-                        <p><strong>세부사항</strong></p>
+                        <p><strong>세부사항:</strong></p>
                         <pre>
-                    {selectedItem.description}
-                </pre>
+                {selectedItem.description}
+            </pre>
                         <p><strong>이미지:</strong></p>
                         <p>Image Name: {selectedItem.imgFilename}</p>
                         {imageUrl ? (
@@ -797,6 +796,8 @@ function Management(){
                     </div>
                 </div>
             )}
+
+
         </div>
 
     );

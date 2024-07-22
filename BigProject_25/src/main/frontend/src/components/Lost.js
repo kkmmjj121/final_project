@@ -362,8 +362,8 @@ function Lost() {
                         {displayedItems.map((item, index) => (
                             <div key={index} className="frame-item">
                                 {showPopup && selectedItem && (
-                                    <div className="popup-overlay">
-                                        <div className="popup-content">
+                                    <div className="popup-overlay" onClick={handlePopupClose}>
+                                        <div className="popup-content" onClick={(e) => e.stopPropagation()}>
                                             <button className="popup-close" onClick={handlePopupClose}>X</button>
                                             <h2>상세 정보</h2>
                                             <p><strong>등록번호:</strong> {selectedItem.lostID}</p>
@@ -376,14 +376,14 @@ function Lost() {
                                             <p><strong>이미지:</strong></p>
                                             <p>Image Name: {selectedItem.imgFilename}</p>
                                             {imageUrl ? (
-                                                <img src={imageUrl} alt={selectedItem.imgFilename}
-                                                     className="popup-image"/>
+                                                <img src={imageUrl} alt={selectedItem.imgFilename} className="popup-image"/>
                                             ) : (
                                                 <p>이미지를 불러오는 중입니다...</p>
                                             )}
                                         </div>
                                     </div>
                                 )}
+
                                 <div className="lost-item-box" onClick={() => handlePopupOpen(item)}>
                                     <div className="lost-item-box-div">{item.category}</div>
                                 </div>
